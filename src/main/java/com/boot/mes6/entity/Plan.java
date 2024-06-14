@@ -18,7 +18,7 @@ public class Plan {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_no")
-    private Order order_no;
+    private Order order;
 
     @Column(nullable = false)
     private String product_name;
