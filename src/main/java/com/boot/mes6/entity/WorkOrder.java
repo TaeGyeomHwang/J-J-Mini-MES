@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "plan")
+@Table(name = "work_order")
 @Getter
 @Setter
 public class WorkOrder {
