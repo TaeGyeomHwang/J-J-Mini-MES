@@ -10,21 +10,29 @@ import java.time.LocalDateTime;
 @Table(name = "plan")
 @Getter
 @Setter
-public class Plan {
-
+public class WorkOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long plan_no;
+    private Long work_order_no;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_no")
-    private Order order_no;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_no")
+    private Plan plan;
+
+    @Column(nullable = false)
+    private boolean work_order_type;
 
     @Column(nullable = false)
     private String product_name;
 
     @Column(nullable = false)
-    private Long production_amount;
+    private String process_name;
+
+    @Column(nullable = false)
+    private String facility_name;
+
+    @Column(nullable = false)
+    private Long work_amount;
 
     @Column(nullable = false)
     private LocalDateTime start_date;
@@ -34,4 +42,10 @@ public class Plan {
 
     @Column(nullable = false)
     private LocalDateTime finish_date;
+
+    @Column(nullable = false)
+    private boolean is_finish;
+
+    @Column(nullable = false)
+    private boolean is_processing;
 }

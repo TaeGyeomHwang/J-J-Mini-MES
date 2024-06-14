@@ -25,17 +25,24 @@ public class Order {
     @Column(nullable = false)
     private Long order_amount;
 
+    @Column(nullable = false)
     private String customer_name;
 
+    @Column(nullable = false)
     private LocalDateTime order_date;
 
+    @Column(nullable = false)
     private LocalDateTime expect_ship_date;
 
+    @Column(nullable = true)
     private LocalDateTime out_date;
 
+    @Column(nullable = false)
     private boolean is_emergency;
 
+    @Column(nullable = false)
     private boolean is_shipped;
 
+    @Column(nullable = false)
     private boolean is_canceled;
 }
