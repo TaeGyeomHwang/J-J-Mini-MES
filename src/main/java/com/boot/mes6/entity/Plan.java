@@ -16,22 +16,14 @@ public class Plan {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long plan_no;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_no")
-    private Order order;
+    @Column(nullable = false)
+    private Long plan_production_amount;
 
     @Column(nullable = false)
-    private String product_name;
+    private LocalDateTime plan_start_date;
 
     @Column(nullable = false)
-    private Long production_amount;
+    private LocalDateTime plan_expect_finish_date;
 
-    @Column(nullable = false)
-    private LocalDateTime start_date;
-
-    @Column(nullable = false)
-    private LocalDateTime expect_finish_date;
-
-    @Column(nullable = false)
-    private LocalDateTime finish_date;
+    private LocalDateTime plan_finish_date;
 }

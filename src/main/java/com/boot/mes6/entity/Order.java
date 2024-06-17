@@ -1,5 +1,8 @@
 package com.boot.mes6.entity;
 
+import com.boot.mes6.constant.ProductName;
+import com.boot.mes6.constant.OrderStatus;
+import com.boot.mes6.constant.OrderType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,32 +20,32 @@ public class Order {
     private Long order_no;
 
     @Column(nullable = false)
-    private boolean order_type;
+    @Enumerated(EnumType.STRING)
+    private OrderType order_type;
 
     @Column(nullable = false)
-    private String product_name;
+    @Enumerated(EnumType.STRING)
+    private ProductName order_product_type;
 
     @Column(nullable = false)
     private Long order_amount;
 
     @Column(nullable = false)
-    private String customer_name;
+    private String order_customer_name;
 
     @Column(nullable = false)
     private LocalDateTime order_date;
 
     @Column(nullable = false)
-    private LocalDateTime expect_ship_date;
+    private LocalDateTime order_expect_ship_date;
 
     @Column(nullable = true)
-    private LocalDateTime out_date;
+    private LocalDateTime order_out_date;
 
     @Column(nullable = false)
-    private boolean is_emergency;
+    private boolean order_is_emergency;
 
     @Column(nullable = false)
-    private boolean is_shipped;
-
-    @Column(nullable = false)
-    private boolean is_canceled;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus order_status;
 }

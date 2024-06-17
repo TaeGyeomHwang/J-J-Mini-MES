@@ -1,5 +1,9 @@
 package com.boot.mes6.entity;
 
+import com.boot.mes6.constant.FacilityName;
+import com.boot.mes6.constant.ProcessCode;
+import com.boot.mes6.constant.ProductType;
+import com.boot.mes6.constant.WorkOrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,32 +24,32 @@ public class WorkOrder {
     private Plan plan;
 
     @Column(nullable = false)
-    private boolean work_order_type;
+    @Enumerated(EnumType.STRING)
+    private ProductType work_order_type;
 
     @Column(nullable = false)
-    private String product_name;
+    @Enumerated(EnumType.STRING)
+    private ProcessCode work_order_process_name;
 
     @Column(nullable = false)
-    private String process_name;
+    @Enumerated(EnumType.STRING)
+    private FacilityName work_order_facility_name;
 
     @Column(nullable = false)
-    private String facility_name;
+    private Long work_order_input;
 
     @Column(nullable = false)
-    private Long work_amount;
+    private Long work_order_output;
 
     @Column(nullable = false)
-    private LocalDateTime start_date;
+    private LocalDateTime work_order_start_date;
 
     @Column(nullable = false)
-    private LocalDateTime expect_finish_date;
+    private LocalDateTime work_order_expect_date;
+
+    private LocalDateTime work_order_finish_date;
 
     @Column(nullable = false)
-    private LocalDateTime finish_date;
-
-    @Column(nullable = false)
-    private boolean is_finish;
-
-    @Column(nullable = false)
-    private boolean is_processing;
+    @Enumerated(EnumType.STRING)
+    private WorkOrderStatus work_order_status;
 }
