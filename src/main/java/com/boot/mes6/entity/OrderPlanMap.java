@@ -17,12 +17,10 @@ public class OrderPlanMap {
     private Long order_plan_map_no;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_no")
-    @Column(nullable = false)
+    @JoinColumn(name = "order_no", nullable = false)
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_no")
-    @Column(nullable = false)
+    @JoinColumn(name = "plan_no", nullable = false)
     private Plan plan;
 }
