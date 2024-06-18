@@ -1,35 +1,36 @@
-//package com.boot.mes6.service;
-//
-//import com.boot.mes6.entity.Order;
-//import com.boot.mes6.entity.Plan;
-//import com.boot.mes6.entity.WorkOrder;
-//import com.boot.mes6.repository.OrderRepositoryHwang;
-//import com.boot.mes6.repository.PlanRepository;
-//import com.boot.mes6.repository.WorkOrderRepository;
-//import jakarta.transaction.Transactional;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//
-//import java.time.LocalDateTime;
-//import java.util.List;
-//
-//@Service
-//@Transactional
-//@RequiredArgsConstructor
-//public class PlanService {
-//    private final PlanRepository planRepository;
-//    private final WorkOrderRepository workOrderRepository;
-//    private final OrderRepositoryHwang orderRepositoryHwang;
-//
-//    public Plan createOrMergePlan(Order order) {
-//        List<Plan> existingPlans = planRepository.findAllByOrderNo(order.getOrder_no());
-//
-//        if (existingPlans.isEmpty()) {
-//            return createNewPlan(order);
-//        } else {
-//            return mergeWithExistingPlan(order, existingPlans);
-//        }
-//    }
+package com.boot.mes6.service;
+
+import com.boot.mes6.constant.ProductType;
+import com.boot.mes6.entity.Order;
+import com.boot.mes6.entity.Plan;
+import com.boot.mes6.entity.WorkOrder;
+import com.boot.mes6.repository.OrderRepositoryHwang;
+import com.boot.mes6.repository.PlanRepository;
+import com.boot.mes6.repository.WorkOrderRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class PlanService {
+    private final PlanRepository planRepository;
+    private final WorkOrderRepository workOrderRepository;
+    private final OrderRepositoryHwang orderRepositoryHwang;
+
+    public Plan createOrMergePlan(Order order) {
+        List<Plan> existingPlans = planRepository.findAllByPlan_no(order.getOrder_no());
+
+        if (existingPlans.isEmpty()) {
+            return createNewPlan(order);
+        } else {
+            return mergeWithExistingPlan(order, existingPlans);
+        }
+    }
 //
 //    private Plan createNewPlan(Order order) {
 //        Plan plan = new Plan();
@@ -65,18 +66,18 @@
 //        LocalDateTime currentStartTime = plan.getPlan_start_date();
 //
 //        // Preprocessing 수정해야함
-////        WorkOrder workOrder = new WorkOrder();
-////        workOrder.setPlan(plan);
-////        workOrder.setWork_order_type(ProductType.JUICE);
-////        workOrder.setWork_order_process_name(ProcessCode.PRETREATMENT);
-////        workOrder.setWorkOrderFacilityName(FacilityName.EXTRACTOR);
-////        workOrder.setWorkOrderInput(1333L);
-////        workOrder.setWorkOrderOutput(1333L);
-////        workOrder.setWorkOrderStartDate(currentStartTime);
-////        workOrder.setWorkOrderExpectDate(currentStartTime.plusHours(2));
-////        workOrderRepository.save(workOrder);
+//        WorkOrder workOrder = new WorkOrder();
+//        workOrder.setPlan(plan);
+//        workOrder.setWork_order_type(ProductType.JUICE);
+//        workOrder.setWork_order_process_name(ProcessCode.PRETREATMENT);
+//        workOrder.setWorkOrderFacilityName(FacilityName.EXTRACTOR);
+//        workOrder.setWorkOrderInput(1333L);
+//        workOrder.setWorkOrderOutput(1333L);
+//        workOrder.setWorkOrderStartDate(currentStartTime);
+//        workOrder.setWorkOrderExpectDate(currentStartTime.plusHours(2));
+//        workOrderRepository.save(workOrder);
 //
-//        // Subsequent processes follow similarly
+//         Subsequent processes follow similarly
 //    }
 //
 //    private void updateWorkOrders(Plan plan) {
@@ -85,5 +86,5 @@
 //
 //        // Update work orders as per the new merged plan details
 //    }
-//
-//}
+
+}

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PlanRepository extends JpaRepository<Plan, Long> {
-//    List<Plan> findAllByOrderNo(Long orderNo);
+    List<Plan> findAllByPlan_no(Long planNo);
 }

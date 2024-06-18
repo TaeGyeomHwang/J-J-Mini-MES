@@ -14,7 +14,7 @@ public class PlanController {
     //  수주 추가 > 생산계획 생성 > 작업지시 생성 시퀀스
     @GetMapping(value = "/new/practice")
     public String addOrder(Model model) {
-        orderServiceHwang.saveOrder();
+        Long orderNo = orderServiceHwang.saveOrder();
         return "example1";
     }
 }
