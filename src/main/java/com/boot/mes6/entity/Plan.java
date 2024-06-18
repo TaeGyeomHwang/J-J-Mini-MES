@@ -14,13 +14,13 @@ public class Plan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long plan_no;
+    private Long planNo;
 
-    private Long plan_production_amount;
+    private Long planProductionAmount;
 
-    private LocalDateTime plan_start_date;
+    private LocalDateTime planStartDate;
 
-    private LocalDateTime plan_expect_finish_date;
+    private LocalDateTime planExpectFinishDate;
 
-    private LocalDateTime plan_finish_date;
+    private LocalDateTime planFinishDate;
 }

@@ -18,30 +18,30 @@ public class MaterialInOut {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long material_no;
+    private Long materialNo;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private MaterialName material_name;
+    private MaterialName materialName;
 
     @Column(nullable = false)
-    private Long material_inout_amount;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private MaterialSupplierName material_supplier_name;
-
-    private LocalDateTime material_order_date;
-
-    private LocalDateTime material_receipt_date;
-
-    private LocalDateTime material_in_date;
-
-    private LocalDateTime material_out_date;
-
-    private LocalDate material_expire_date;
+    private Long materialInoutAmount;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private MaterialStatus material_status;
+    private MaterialSupplierName materialSupplierName;
+
+    private LocalDateTime materialOrderDate;
+
+    private LocalDateTime materialReceiptDate;
+
+    private LocalDateTime materialInDate;
+
+    private LocalDateTime materialOutDate;
+
+    private LocalDate materialExpireDate;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MaterialStatus materialStatus;
 }

@@ -14,7 +14,7 @@ public class OrderPlanMap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long order_plan_map_no;
+    private Long orderPlanMapNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_no", nullable = false)

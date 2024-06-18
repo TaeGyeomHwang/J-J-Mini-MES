@@ -15,9 +15,9 @@ public class CurrentMaterial {
 
     @Id
     @Enumerated(EnumType.STRING)
-    private MaterialName current_material_name;
+    private MaterialName currentMaterialName;
 
     @Column(nullable = false)
-    private Long current_material_amount;
+    private Long currentMaterialAmount;
 
 }

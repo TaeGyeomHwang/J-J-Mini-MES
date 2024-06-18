@@ -17,33 +17,33 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long order_no;
+    private Long orderNo;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private OrderType order_type;
+    private OrderType orderType;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProductName order_product_type;
+    private ProductName orderProductType;
 
     @Column(nullable = false)
-    private Long order_amount;
+    private Long orderAmount;
 
     @Column(nullable = false)
-    private String order_customer_name;
+    private String orderCustomerName;
 
     @Column(nullable = false)
-    private LocalDateTime order_date;
+    private LocalDateTime orderDate;
 
-    private LocalDateTime order_expect_ship_date;
+    private LocalDateTime orderExpectShipDate;
 
-    private LocalDateTime order_out_date;
+    private LocalDateTime orderOutDate;
 
     @Column(nullable = false)
-    private boolean order_is_emergency;
+    private boolean orderIsEmergency;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private OrderStatus order_status;
+    private OrderStatus orderStatus;
 }
