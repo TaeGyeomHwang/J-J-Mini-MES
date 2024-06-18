@@ -6,6 +6,7 @@ import com.boot.mes6.constant.OrderType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
@@ -36,10 +37,8 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime order_date;
 
-    @Column(nullable = false)
     private LocalDateTime order_expect_ship_date;
 
-    @Column(nullable = true)
     private LocalDateTime order_out_date;
 
     @Column(nullable = false)
