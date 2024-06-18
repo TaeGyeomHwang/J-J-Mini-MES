@@ -16,13 +16,10 @@ public class Plan {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long plan_no;
 
-    @Column(nullable = false)
     private Long plan_production_amount;
 
-    @Column(nullable = false)
     private LocalDateTime plan_start_date;
 
-    @Column(nullable = false)
     private LocalDateTime plan_expect_finish_date;
 
     private LocalDateTime plan_finish_date;

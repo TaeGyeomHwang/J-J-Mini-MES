@@ -36,10 +36,8 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime order_date;
 
-    @Column(nullable = false)
     private LocalDateTime order_expect_ship_date;
 
-    @Column(nullable = true)
     private LocalDateTime order_out_date;
 
     @Column(nullable = false)
