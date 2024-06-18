@@ -23,25 +23,25 @@ public class PlanService {
     private final OrderRepositoryHwang orderRepositoryHwang;
 
     public Plan createOrMergePlan(Order order) {
-        List<Plan> existingPlans = planRepository.findAllByPlan_no(order.getOrder_no());
-
-        if (existingPlans.isEmpty()) {
+        Order existOrder = orderRepositoryHwang.findTopByOrderProductTypeOrderByOrderNoDesc(order.getOrderProductType().name(),order.getOrderNo());
+        if (foundOrder!=null){
+            System.out.println("찾은 수주 번호: "+existOrder.getOrderNo());
             return createNewPlan(order);
-        } else {
-            return mergeWithExistingPlan(order, existingPlans);
+        }else{
+            return mergeWithExistingPlan(order, existOrder);
         }
     }
-//
-//    private Plan createNewPlan(Order order) {
-//        Plan plan = new Plan();
-//        plan.setPlan_production_amount(calculateProductionAmount(order));
-//        plan.setPlan_start_date(LocalDateTime.now());
-//        plan.setPlan_expect_finish_date(calculateExpectedFinishDate(plan.getPlan_start_date(), plan.getPlan_production_amount()));
-//        planRepository.save(plan);
-//        createWorkOrders(plan);
-//        return plan;
-//    }
-//    private Plan mergeWithExistingPlan(Order order, List<Plan> existingPlans) {
+
+    private Plan createNewPlan(Order order) {
+        Plan plan = new Plan();
+        plan.setPlan_production_amount(calculateProductionAmount(order));
+        plan.setPlan_start_date(LocalDateTime.now());
+        plan.setPlan_expect_finish_date(calculateExpectedFinishDate(plan.getPlan_start_date(), plan.getPlan_production_amount()));
+        planRepository.save(plan);
+        createWorkOrders(plan);
+        return plan;
+    }
+//    private Plan mergeWithExistingPlan(Order order, Order existingPlans) {
 //        // Assuming we merge with the first plan found for simplicity
 //        Plan plan = existingPlans.get(0);
 //        plan.setPlan_production_amount(plan.getPlan_production_amount() + calculateProductionAmount(order));

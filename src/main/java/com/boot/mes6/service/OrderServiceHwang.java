@@ -3,6 +3,7 @@ package com.boot.mes6.service;
 import com.boot.mes6.constant.OrderStatus;
 import com.boot.mes6.constant.OrderType;
 import com.boot.mes6.constant.ProductName;
+import com.boot.mes6.dto.OrderPlanMapDto;
 import com.boot.mes6.entity.Order;
 import com.boot.mes6.entity.OrderPlanMap;
 import com.boot.mes6.entity.Plan;
@@ -27,18 +28,18 @@ public class OrderServiceHwang {
     public Long saveOrder(){
         Order order = new Order();
 
-        order.setOrder_type(OrderType.COMPANY);
-        order.setOrder_product_type(ProductName.CABBAGE_JUICE);
-        order.setOrder_amount(123L);
-        order.setOrder_customer_name("xx식품");
-        order.setOrder_date(LocalDateTime.now());
+        order.setOrderType(OrderType.COMPANY);
+        order.setOrderProductType(ProductName.CABBAGE_JUICE);
+        order.setOrderAmount(123L);
+        order.setOrderCustomerName("xx식품");
+        order.setOrderDate(LocalDateTime.now());
         System.out.println("현재시각: "+LocalDateTime.now());
-        order.setOrder_is_emergency(false);
-        order.setOrder_status(OrderStatus.BEFORE_REGISTER);
+        order.setOrderIsEmergency(false);
+        order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
 
         orderRepositoryHwang.save(order);
 
-        return order.getOrder_no();
+        return order.getOrderNo();
     }
 
     public Long saveOrderPlanMap(Long orderNo, Long planNo){
@@ -54,6 +55,15 @@ public class OrderServiceHwang {
 
         orderPlanMapRepositoryHwang.save(orderPlanMap);
 
-        return orderPlanMap.getOrder_plan_map_no();
+        return orderPlanMap.getOrderPlanMapNo();
+    }
+
+    public OrderPlanMapDto saveOrderDto(Order order){
+        OrderPlanMapDto orderPlanMapDto = new OrderPlanMapDto();
+        orderPlanMapDto.setOrderNo(order.getOrderNo());
+        orderPlanMapDto.setProductName(order.getOrderProductType());
+        orderPlanMapDto.setOrderAmount(order.getOrderAmount());
+
+        return orderPlanMapDto;
     }
 }

@@ -7,14 +7,14 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "current_time")
+@Table(name = "current_time_record")
 @Getter
 @Setter
 public class CurrentTime {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long current_time_no;
+    private Long currentTimeNo;
 
     @Column(nullable = false)
-    private LocalDateTime current_time_value;
+    private LocalDateTime currentTimeValue;
 }
