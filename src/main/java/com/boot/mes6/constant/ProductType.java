@@ -6,5 +6,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum ProductType {
-    JUICE,JELLY;
+    JUICE("즙"),
+    JELLY("젤리스틱");
+
+    private final String description;
 }
