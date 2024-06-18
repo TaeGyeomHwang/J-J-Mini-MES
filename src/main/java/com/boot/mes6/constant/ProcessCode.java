@@ -6,5 +6,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum ProcessCode {
-    A1,A2,A3,A4,A5,A6,A7,A8,B1,B2,B3,B4,B5,B6,B7;
+    A1("전처리"),
+    A2("추출"),
+    A3("여과"),
+    A4("살균"),
+    A5("충진"),
+    A6("검사"),
+    A7("포장"),
+    B1("혼합"),
+    B2("살균"),
+    B3("충진"),
+    B4("냉각"),
+    B5("검사"),
+    B6("포장");
+
+    private final String description;
 }
