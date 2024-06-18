@@ -2,7 +2,115 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <div th:fragment="header">
-    <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-dark sidebar sidebar-dark accordion" id="accordionSidebar">
+
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+            <div class="sidebar-brand-text mx-3">
+                <h1>Home</h1>
+            </div>
+        </a>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
+
+        <!-- 수주관리 -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOrder"
+               aria-expanded="true" aria-controls="collapseOrder">
+                <span>수주관리</span>
+            </a>
+            <div id="collapseOrder" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="#">수주 목록</a>
+                </div>
+            </div>
+        </li>
+
+        <!-- 원자재 관리 -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMaterial"
+               aria-expanded="true" aria-controls="collapseMaterial">
+                <span>원자재 관리</span>
+            </a>
+            <div id="collapseMaterial" class="collapse" aria-labelledby="headingUtilities"
+                 data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="#">원자재 입출고 이력</a>
+                    <a class="collapse-item" href="#">원자재 재고 현황</a>
+                </div>
+            </div>
+        </li>
+
+        <!-- 완제품 관리 -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProduct"
+               aria-expanded="true" aria-controls="collapseProduct">
+                <span>완제품 관리</span>
+            </a>
+            <div id="collapseProduct" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="#">완제품 입출고 이력</a>
+                    <a class="collapse-item" href="#">완제품 재고 현황</a>
+                </div>
+            </div>
+        </li>
+
+        <!-- 생산 관리 -->
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapsePlan"
+               aria-expanded="true" aria-controls="collapsePlan">
+                <span>생산 관리</span>
+            </a>
+            <div id="collapsePlan" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="#">생산계획</a>
+                    <a class="collapse-item" href="#">즙 작업지시</a>
+                    <a class="collapse-item" href="#">젤리스틱 작업지시</a>
+                </div>
+            </div>
+        </li>
+
+        <!-- 현황 관리 -->
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapseSituation"
+               aria-expanded="true" aria-controls="collapseSituation">
+                <span>현황 관리</span>
+            </a>
+            <div id="collapseSituation" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="#">설비 가동 상황</a>
+                    <a class="collapse-item" href="#">충진 카운트</a>
+                    <a class="collapse-item" href="#">수주별 진행률</a>
+                </div>
+            </div>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+
+
+        <!-- Sidebar Message -->
+        <div class="sidebar-card d-none d-lg-flex">
+            <!-- 여기에 테스트 시간/타이머 -->
+            <div class="row">
+                <div id="current-time" style="margin-bottom: 10px;">현재 시각<br>16:13<br>2024-06-07 FRI</div>
+                <div class="col">
+                    <button class="btn btn-success btn-sm" onclick="increaseTime(10)">+10분</button>
+                    <button class="btn btn-success btn-sm" onclick="increaseTime(60)">+1시간</button>
+                    <button class="btn btn-success btn-sm" onclick="increaseTime(1440)">+1일</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!--<nav class="navbar navbar-expand-sm bg-primary navbar-dark">
         <button class="navbar-toggler" type="button" data-toggle="collapse"
                 data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03"
                 aria-expanded="false" aria-label="Toggle navigation">
@@ -12,31 +120,31 @@
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-<!--                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">-->
-<!--                    <a class="nav-link" href="/admin/item/new">상품 등록</a>-->
-<!--                </li>-->
-<!--                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">-->
-<!--                    <a class="nav-link" href="/admin/items">상품 관리</a>-->
-<!--                </li>-->
-<!--                <li class="nav-item" sec:authorize="isAuthenticated()">-->
-<!--                    <a class="nav-link" href="/cart">장바구니</a>-->
-<!--                </li>-->
-<!--                <li class="nav-item" sec:authorize="isAuthenticated()">-->
-<!--                    <a class="nav-link" href="/orders">구매이력</a>-->
-<!--                </li>-->
-<!--                <li class="nav-item" sec:authorize="isAnonymous()">-->
-<!--                    <a class="nav-link" href="/members/login">로그인</a>-->
-<!--                </li>-->
-<!--                <li class="nav-item" sec:authorize="isAuthenticated()">-->
-<!--                    <a class="nav-link" href="/members/logout">로그아웃</a>-->
-<!--                </li>-->
+&lt;!&ndash;                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">&ndash;&gt;
+&lt;!&ndash;                    <a class="nav-link" href="/admin/item/new">상품 등록</a>&ndash;&gt;
+&lt;!&ndash;                </li>&ndash;&gt;
+&lt;!&ndash;                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">&ndash;&gt;
+&lt;!&ndash;                    <a class="nav-link" href="/admin/items">상품 관리</a>&ndash;&gt;
+&lt;!&ndash;                </li>&ndash;&gt;
+&lt;!&ndash;                <li class="nav-item" sec:authorize="isAuthenticated()">&ndash;&gt;
+&lt;!&ndash;                    <a class="nav-link" href="/cart">장바구니</a>&ndash;&gt;
+&lt;!&ndash;                </li>&ndash;&gt;
+&lt;!&ndash;                <li class="nav-item" sec:authorize="isAuthenticated()">&ndash;&gt;
+&lt;!&ndash;                    <a class="nav-link" href="/orders">구매이력</a>&ndash;&gt;
+&lt;!&ndash;                </li>&ndash;&gt;
+&lt;!&ndash;                <li class="nav-item" sec:authorize="isAnonymous()">&ndash;&gt;
+&lt;!&ndash;                    <a class="nav-link" href="/members/login">로그인</a>&ndash;&gt;
+&lt;!&ndash;                </li>&ndash;&gt;
+&lt;!&ndash;                <li class="nav-item" sec:authorize="isAuthenticated()">&ndash;&gt;
+&lt;!&ndash;                    <a class="nav-link" href="/members/logout">로그아웃</a>&ndash;&gt;
+&lt;!&ndash;                </li>&ndash;&gt;
             </ul>
             <form class="form-inline my-2 my-lg-0" th:action="@{/}" method="get">
                 <input name="searchQuery" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
         </div>
-    </nav>
+    </nav>-->
 </div>
 
 </html>
