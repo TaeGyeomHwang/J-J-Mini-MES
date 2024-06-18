@@ -15,16 +15,16 @@ public class ProductInOut {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long product_no;
+    private Long productNo;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProductName product_name;
+    private ProductName productName;
 
     @Column(nullable = false)
-    private Long product_inout_amount;
+    private Long productInoutAmount;
 
-    private LocalDateTime product_in_date;
+    private LocalDateTime productInDate;
 
-    private LocalDateTime product_out_date;
+    private LocalDateTime productOutDate;
 }

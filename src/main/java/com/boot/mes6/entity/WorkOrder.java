@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class WorkOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long work_order_no;
+    private Long workOrderNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_no")
@@ -25,31 +25,31 @@ public class WorkOrder {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProductType work_order_type;
+    private ProductType workOrderType;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProcessCode work_order_process_name;
+    private ProcessCode workOrderProcessName;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private FacilityName work_order_facility_name;
+    private FacilityName workOrderFacilityName;
 
     @Column(nullable = false)
-    private Long work_order_input;
+    private Long workOrderInput;
 
     @Column(nullable = false)
-    private Long work_order_output;
+    private Long workOrderOutput;
 
     @Column(nullable = false)
-    private LocalDateTime work_order_start_date;
+    private LocalDateTime workOrderStartDate;
 
     @Column(nullable = false)
-    private LocalDateTime work_order_expect_date;
+    private LocalDateTime workOrderExpectDate;
 
-    private LocalDateTime work_order_finish_date;
+    private LocalDateTime workOrderFinishDate;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private WorkOrderStatus work_order_status;
+    private WorkOrderStatus workOrderStatus;
 }

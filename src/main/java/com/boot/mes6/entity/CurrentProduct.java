@@ -13,11 +13,11 @@ public class CurrentProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private ProductName current_product_name;
+    private ProductName currentProductName;
 
     @Column(nullable = false)
-    private Long current_product_amount;
+    private Long currentProductAmount;
 
     @Column(nullable = false)
-    private Long current_product_safe_amount;
+    private Long currentProductSafeAmount;
 }
