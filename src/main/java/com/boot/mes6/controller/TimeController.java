@@ -14,11 +14,13 @@ public class TimeController {
 
     private final TimeService timeService;
 
+    //시스템 시간 가져오기
     @GetMapping("/time")
     public ResponseEntity<LocalDateTime> systemTime() {
         return ResponseEntity.ok(timeService.getCurrentTime());
     }
 
+    //시스템 시간 증가 시키기
     @PostMapping("/increaseTime")
     public ResponseEntity<Void> increaseTime(@RequestParam int minutes) {
         timeService.increaseTime(minutes);

@@ -14,11 +14,13 @@ import java.time.LocalDateTime;
 public class TimeService {
     private final TimeRepository timeRepository;
 
+    //시스템 시간 가져오기
     public LocalDateTime getCurrentTime() {
         CurrentTime currentTime = timeRepository.findByCurrentTimeNo(1L);
         return currentTime.getCurrentTimeValue();
     }
 
+    //시스템 시간 증가 시키기
     @Transactional
     public void increaseTime(int minutes){
         CurrentTime currentTime = timeRepository.findByCurrentTimeNo(1L);

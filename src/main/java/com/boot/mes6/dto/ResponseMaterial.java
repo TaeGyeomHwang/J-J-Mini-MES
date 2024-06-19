@@ -1,48 +1,29 @@
-package com.boot.mes6.entity;
+package com.boot.mes6.dto;
 
 import com.boot.mes6.constant.MaterialName;
 import com.boot.mes6.constant.MaterialStatus;
 import com.boot.mes6.constant.MaterialSupplierName;
-import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity
+@NoArgsConstructor // 기본 생성자 추가
+@AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "material_in_out")
-public class MaterialInOut {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class ResponseMaterial {
     private Long materialNo;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private MaterialName materialName;
-
-    @Column(nullable = false)
     private Long materialInoutAmount;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private MaterialSupplierName materialSupplierName;
-
     private LocalDateTime materialOrderDate;
-
     private LocalDateTime materialReceiptDate;
-
     private LocalDateTime materialInDate;
-
     private LocalDateTime materialOutDate;
-
     private LocalDate materialExpireDate;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private MaterialStatus materialStatus;
 }
