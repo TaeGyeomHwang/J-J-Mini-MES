@@ -9,7 +9,7 @@ import com.boot.mes6.entity.OrderPlanMap;
 import com.boot.mes6.entity.Plan;
 import com.boot.mes6.repository.OrderPlanMapRepositoryHwang;
 import com.boot.mes6.repository.OrderRepositoryHwang;
-import com.boot.mes6.repository.PlanRepository;
+import com.boot.mes6.repository.PlanRepositoryHwang;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public class OrderServiceHwang {
     private final OrderRepositoryHwang orderRepositoryHwang;
     private final OrderPlanMapRepositoryHwang orderPlanMapRepositoryHwang;
-    private final PlanRepository planRepository;
+    private final PlanRepositoryHwang planRepository;
 
     public Long saveOrder(){
         Order order = new Order();

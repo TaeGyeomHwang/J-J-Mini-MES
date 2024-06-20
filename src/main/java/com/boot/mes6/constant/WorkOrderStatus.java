@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum WorkOrderStatus {
-    WAITING("완료"),
+    WAITING("대기"),
     PROCESSING("진행 중"),
-    COMPLETE("대기");
+    COMPLETE("완료");
 
     private final String description;
 }
