@@ -11,7 +11,6 @@ import com.boot.mes6.repository.WorkOrderRepositoryHwang;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,7 +20,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class WorkOrderService {
+public class WorkOrderServiceHwang {
 
     private final PlanRepositoryHwang planRepository;
     private final WorkOrderRepositoryHwang workOrderRepositoryHwang;

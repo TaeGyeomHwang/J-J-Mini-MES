@@ -10,7 +10,6 @@ import com.boot.mes6.repository.OrderPlanMapRepositoryHwang;
 import com.boot.mes6.repository.OrderRepositoryHwang;
 import com.boot.mes6.repository.PlanRepositoryHwang;
 import com.boot.mes6.repository.WorkOrderRepositoryHwang;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +25,9 @@ import java.util.Set;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class PlanService {
+public class PlanServiceHwang {
 
-    private final WorkOrderService workOrderService;
+    private final WorkOrderServiceHwang workOrderServiceHwang;
 
     private final PlanRepositoryHwang planRepository;
     private final WorkOrderRepositoryHwang workOrderRepositoryHwang;
@@ -139,10 +138,10 @@ public class PlanService {
                 orderPlanMapRepositoryHwang.save(newOrderPlanMap);
 
                 //  기존 작업지시 삭제
-                List<Long> deletedWorkOrderList = workOrderService.deleteWorkOrderWithPlanNo(planNo);
+                List<Long> deletedWorkOrderList = workOrderServiceHwang.deleteWorkOrderWithPlanNo(planNo);
 
                 //  생산계획ID로 작업지시 생성
-                List<Long> workOrderNoList = workOrderService.createNewWorkOrder(planNo, productType);
+                List<Long> workOrderNoList = workOrderServiceHwang.createNewWorkOrder(planNo, productType);
                 summedAmount -= planProductionAmount;
 
                 if(summedAmount>0){
@@ -268,7 +267,7 @@ public class PlanService {
             orderPlanMapRepositoryHwang.save(orderPlanMap);
 
             //  작업지시 생성
-            List<Long> workOrderNoList = workOrderService.createNewWorkOrder(planNo, productType);
+            List<Long> workOrderNoList = workOrderServiceHwang.createNewWorkOrder(planNo, productType);
             switch (productName){
                 case CABBAGE_JUICE:
                 case GARLIC_JUICE:

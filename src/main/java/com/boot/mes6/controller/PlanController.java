@@ -1,11 +1,9 @@
 package com.boot.mes6.controller;
 
-import com.boot.mes6.constant.OrderStatus;
-import com.boot.mes6.dto.OrderPlanMapDto;
 import com.boot.mes6.entity.Order;
 import com.boot.mes6.repository.OrderRepositoryHwang;
 import com.boot.mes6.service.OrderServiceHwang;
-import com.boot.mes6.service.PlanService;
+import com.boot.mes6.service.PlanServiceHwang;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -16,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class PlanController {
     private final OrderServiceHwang orderServiceHwang;
-    private final PlanService planService;
+    private final PlanServiceHwang planServiceHwang;
 
     private final OrderRepositoryHwang orderRepositoryHwang;
 
@@ -26,7 +24,7 @@ public class PlanController {
         Long orderNo = orderServiceHwang.saveOrder();
         Order order = orderRepositoryHwang.findById(orderNo)
                 .orElseThrow(EntityNotFoundException::new);
-        planService.createOrMergePlan(order);
+        planServiceHwang.createOrMergePlan(order);
 
         return "example1";
     }
