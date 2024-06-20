@@ -13,7 +13,13 @@ public class OrderController {
     
     //  수주 목록 조회 페이지
     @GetMapping(value = "/orders")
-    public String orderManage(Model model) {
+    public String manageOrder(Model model) {
+
+        return "order/orderMng";
+    }
+
+    @GetMapping(value = "/order/new")
+    public String addOrder(Model model) {
 
         return "order/orderMng";
     }
