@@ -48,6 +48,7 @@
     </div>
     <br>
     <button class="btn btn-primary" id="submit">완료</button>
+    <button class="btn btn-primary" id="test">테스트</button>
 </div>
 
 <th:block layout:fragment="script">
@@ -112,6 +113,21 @@
                         console.error('에러 발생:', error);
                         // 에러 처리 로직 추가
                     });
+            });
+
+            //test
+            document.getElementById('test').addEventListener('click', function() {
+                console.log(1);
+                fetch('/test', {
+                    method: 'POST',
+                })
+                    .then(response => {
+                        console.log("good");
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+
             });
         });
     </script>

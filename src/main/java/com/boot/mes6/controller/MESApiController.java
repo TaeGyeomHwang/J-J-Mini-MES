@@ -1,8 +1,12 @@
 package com.boot.mes6.controller;
 
 import com.boot.mes6.constant.MaterialStatus;
+import com.boot.mes6.constant.OrderStatus;
+import com.boot.mes6.constant.OrderType;
+import com.boot.mes6.constant.ProductName;
 import com.boot.mes6.dto.AddMaterial;
 import com.boot.mes6.entity.MaterialInOut;
+import com.boot.mes6.entity.Order;
 import com.boot.mes6.service.MaterialService;
 import com.boot.mes6.service.TimeService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +23,8 @@ public class MESApiController {
     private final TimeService timeService;
     private final MaterialService materialService;
 
-    //원자재 발주 추가
+    //수동 원자재 발주 추가
+    //아직 미완성
     @PostMapping("/AddMaterial")
     public ResponseEntity<AddMaterial> addMaterial(@RequestBody AddMaterial addMaterial) {
         //System.out.println("good");
@@ -39,10 +44,33 @@ public class MESApiController {
         //토요일과 일요일을 제외하고 currentTime이 오후 12시 이전 이라면 ReceiptDate를 currentTime의 해당 날짜의 12시로 설정
         //오후 12시 이후라면 currentTime의 해당 날짜에서 +1일 12시로 설정
         //주말을 제외했으니
-        materialInOut.setMaterialReceiptDate();
+        //materialInOut.setMaterialReceiptDate();
 
         materialService.addMaterial(materialInOut);
 
         return ResponseEntity.ok().body(addMaterial);
     }
+
+    //원자재가 자동 발주되는지 테스트
+    @PostMapping("/test")
+    public ResponseEntity<Void> test() {
+        LocalDateTime currentTime = timeService.getCurrentTime();
+
+        Order order = new Order();
+        order.setOrderNo(1L);
+        order.setOrderType(OrderType.COMPANY);
+        order.setOrderProductType(ProductName.CABBAGE_JUICE);
+        order.setOrderAmount(323L);
+        order.setOrderCustomerName("John Doe");
+        order.setOrderDate(currentTime);
+        order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
+
+
+
+        materialService.autoAddMaterial(order);
+
+
+        return null;
+    }
+
 }

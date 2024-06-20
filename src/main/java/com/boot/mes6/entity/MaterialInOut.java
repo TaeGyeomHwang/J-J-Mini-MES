@@ -21,6 +21,10 @@ public class MaterialInOut {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long materialNo;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_no")
+    private Order order;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MaterialName materialName;
