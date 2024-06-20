@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <meta charset="UTF-8">
+    <title>수주 추가</title>
+</head>
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+    <style>
+        select {
+            width: 250px;
+        }
+    </style>
+</th:block>
+
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            var errorMessage = [[${errorMessage}]];
+            if (errorMessage != null) {
+                alert(errorMessage);
+            }
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="content" class="container-fluid">
+    <form action="/order/new" role="form" method="post" th:object="${orderFormDto}">
+        <h1>수주 추가</h1>
+        <div class="form-group">
+            <select name="orderType" class="form-select" th:field="*{orderType}">
+                <option selected value="COMPANY">업체</option>
+                <option value="GENERAL">일반 소비자</option>
+            </select>
+        </div>
+        <br>
+        <div class="form-group">
+            <label th:for="productName">제품명</label>
+            <select name="productName" class="form-select" th:field="*{productName}">
+                <option selected value="CABBAGE_JUICE">양배추즙</option>
+                <option value="GARLIC_JUICE">흑마늘즙</option>
+                <option value="POMEGRANATE_JELLY">석류 젤리스틱</option>
+                <option value="PLUM_JELLY">매실 젤리스틱</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label th:for="orderAmount">주문량</label>
+            <input type="text" th:field="*{orderAmount}" class="form-control" placeholder="주문량(box)을 입력하세요">
+        </div>
+        <h3>업체명/고객명</h3>
+        <input type="text" th:field="*{orderCustomerName}" class="form-control" placeholder="업체명(고객명)을 입력하세요">
+        <h3>긴급 여부</h3>
+        <select name="orderIsEmergency" class="form-select" th:field="*{orderIsEmergency}">
+            <option selected value="false">N</option>
+            <option value="true">Y</option>
+        </select>
+        <br>
+        <button class="btn btn-primary" id="submit">완료</button>
+    </form>
+</div>
