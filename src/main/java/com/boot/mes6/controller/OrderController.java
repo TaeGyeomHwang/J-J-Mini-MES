@@ -2,7 +2,9 @@ package com.boot.mes6.controller;
 
 import com.boot.mes6.dto.OrderFormDto;
 import com.boot.mes6.entity.Order;
+import com.boot.mes6.repository.OrderRepositoryHwang;
 import com.boot.mes6.service.OrderServiceHwang;
+import com.boot.mes6.service.PlanServiceHwang;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderServiceHwang orderServiceHwang;
+    private final PlanServiceHwang planServiceHwang;
+
+    private final OrderRepositoryHwang orderRepositoryHwang;
     
     //  수주 목록 조회 페이지
     @GetMapping(value = "/orders")
@@ -36,6 +41,9 @@ public class OrderController {
         }
         try{
             Long orderNo = orderServiceHwang.saveOrderManual(orderFormDto);
+            Order order = orderRepositoryHwang.findById(orderNo)
+                    .orElseThrow(EntityNotFoundException::new);
+            planServiceHwang.createOrMergePlan(order);
         }catch(IllegalStateException e){
             model.addAttribute("errorMessage", e.getMessage());
             return "order/orderMng";

@@ -26,6 +26,7 @@ public class OrderServiceHwang {
     private final PlanRepositoryHwang planRepository;
     private final CurrentTimeRepositoryHwang currentTimeRepositoryHwang;
 
+    //  더미 수주 추가
     public Long saveOrder() {
         Order order = new Order();
 
