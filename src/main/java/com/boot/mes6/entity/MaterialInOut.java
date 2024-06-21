@@ -4,6 +4,7 @@ import com.boot.mes6.constant.MaterialName;
 import com.boot.mes6.constant.MaterialStatus;
 import com.boot.mes6.constant.MaterialSupplierName;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,10 @@ public class MaterialInOut {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long materialNo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_no")
+    private Order order;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum FacilityName {
+    NONE("-"),
     JUICE_WRAPPER_1("즙 포장기1"),
     JUICE_WRAPPER_2("즙 포장기2"),
     JELLY_WRAPPER_1("스틱 포장기1"),
