@@ -6,6 +6,7 @@ import com.boot.mes6.constant.ProductName;
 import com.boot.mes6.dto.OrderFormDto;
 import com.boot.mes6.entity.CurrentTime;
 import com.boot.mes6.entity.Order;
+import com.boot.mes6.entity.Plan;
 import com.boot.mes6.repository.CurrentTimeRepositoryHwang;
 import com.boot.mes6.repository.OrderPlanMapRepositoryHwang;
 import com.boot.mes6.repository.OrderRepositoryHwang;
@@ -13,9 +14,12 @@ import com.boot.mes6.repository.PlanRepositoryHwang;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -23,8 +27,18 @@ import java.time.LocalDateTime;
 public class OrderServiceHwang {
     private final OrderRepositoryHwang orderRepositoryHwang;
     private final OrderPlanMapRepositoryHwang orderPlanMapRepositoryHwang;
-    private final PlanRepositoryHwang planRepository;
+    private final PlanRepositoryHwang planRepositoryHwang;
     private final CurrentTimeRepositoryHwang currentTimeRepositoryHwang;
+
+    //  수주 이력 가져오기
+    public List<Order> getAllOrder() {
+        return orderRepositoryHwang.findAll();
+    }
+
+    // 수주 목록 페이징 조회
+    public Page<Order> getOrders(Pageable pageable) {
+        return orderRepositoryHwang.findAll(pageable);
+    }
 
     //  더미 수주 추가
     public Long saveOrder() {
@@ -57,6 +71,15 @@ public class OrderServiceHwang {
         order.setOrderIsEmergency(order.isOrderIsEmergency());
         order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
 
+        orderRepositoryHwang.save(order);
+        return order.getOrderNo();
+    }
+
+    //  수주ID로 예상 납품일 수정
+    public Long updateOrderExpectDate(Order order, Long planNo) {
+        Plan plan = planRepositoryHwang.findById(planNo)
+                .orElseThrow(EntityNotFoundException::new);
+        order.setOrderExpectShipDate(plan.getPlanExpectFinishDate());
         orderRepositoryHwang.save(order);
         return order.getOrderNo();
     }

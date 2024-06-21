@@ -14,4 +14,8 @@ public interface OrderPlanMapRepositoryHwang extends JpaRepository<OrderPlanMap,
     @Query(value = "SELECT * FROM order_plan_map o WHERE o.order_no = :orderNo " +
             "ORDER BY o.plan_no DESC LIMIT 1", nativeQuery = true)
     OrderPlanMap findTopByOrderNoOrderByPlanNoDesc(@Param("orderNo") Long orderNo);
+
+    //  해당 생산계획번호를 가지는 수주번호 리스트 조회
+    @Query(value = "SELECT * FROM order_plan_map o WHERE o.plan_no = :planNo ", nativeQuery = true)
+    List<OrderPlanMap> findListByPlanNo(@Param("planNo") Long planNo);
 }

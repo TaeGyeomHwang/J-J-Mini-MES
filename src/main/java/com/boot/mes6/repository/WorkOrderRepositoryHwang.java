@@ -1,10 +1,14 @@
 package com.boot.mes6.repository;
 
+import com.boot.mes6.constant.ProductType;
 import com.boot.mes6.entity.WorkOrder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface WorkOrderRepositoryHwang extends JpaRepository<WorkOrder, Long> {
@@ -16,4 +20,11 @@ public interface WorkOrderRepositoryHwang extends JpaRepository<WorkOrder, Long>
     // 특정 생산계획ID를 가지는 모든 작업지시 찾기
     @Query("SELECT w FROM WorkOrder w WHERE w.plan.planNo = :planNo")
     List<WorkOrder> findAllByPlanNo(@Param("planNo") Long planNo);
+
+    //  특정 제품 종류를 생산하는 모든 작업지시 페이징해서 찾기
+    Page<WorkOrder> findByWorkOrderType(ProductType workOrderType, PageRequest pageRequest);
+
+    // 특정 제품 종류를 생산하면서 주어진 날짜 범위 내에 있는 작업지시 페이징해서 찾기
+    Page<WorkOrder> findByWorkOrderTypeAndWorkOrderStartDateBetween(
+            ProductType workOrderType, LocalDateTime startDate, LocalDateTime endDate, PageRequest pageRequest);
 }
