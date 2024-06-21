@@ -99,7 +99,12 @@
                     { "data": "orderNo" },
                     { "data": "orderType" },
                     { "data": "orderProductType" },
-                    { "data": "orderAmount" },
+                    {
+                        "data": "orderAmount",
+                        "render": function (data, type, row) {
+                            return data + " Box";
+                        }
+                    },
                     { "data": "orderCustomerName" },
                     {
                         "data": "orderDate",
