@@ -83,7 +83,7 @@
                 }
             });
 
-            // 완료 버튼 클릭 시 데이터를 서버로 전송
+            // test
             document.getElementById('submit').addEventListener('click', function() {
                 var data = {
                     materialName: document.getElementById('MaterialName').value,
@@ -117,12 +117,17 @@
 
             //test
             document.getElementById('test').addEventListener('click', function() {
-                console.log(1);
+                //console.log(1);
                 fetch('/test', {
                     method: 'POST',
                 })
                     .then(response => {
                         console.log("good");
+                        console.log(response);
+                        fetch('/test2', {
+                            method:'POST',
+                            body: response,
+                        });
                     })
                     .catch(error => {
                         console.log(error);

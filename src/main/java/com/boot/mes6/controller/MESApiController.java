@@ -7,6 +7,7 @@ import com.boot.mes6.constant.ProductName;
 import com.boot.mes6.dto.AddMaterial;
 import com.boot.mes6.entity.MaterialInOut;
 import com.boot.mes6.entity.Order;
+import com.boot.mes6.repository.MaterialRepository;
 import com.boot.mes6.service.MaterialService;
 import com.boot.mes6.service.TimeService;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class MESApiController {
     private final TimeService timeService;
     private final MaterialService materialService;
+    private final MaterialRepository materialRepository;
 
     //수동 원자재 발주 추가
     //아직 미완성
@@ -57,20 +60,16 @@ public class MESApiController {
         LocalDateTime currentTime = timeService.getCurrentTime();
 
         Order order = new Order();
-        order.setOrderNo(1L);
+        order.setOrderNo(2L);
         order.setOrderType(OrderType.COMPANY);
         order.setOrderProductType(ProductName.CABBAGE_JUICE);
-        order.setOrderAmount(323L);
+        order.setOrderAmount(1000L);
         order.setOrderCustomerName("John Doe");
         order.setOrderDate(currentTime);
         order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
 
-
-
         materialService.autoAddMaterial(order);
-
 
         return null;
     }
-
 }
