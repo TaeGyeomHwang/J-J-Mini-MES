@@ -120,6 +120,7 @@ public class WorkOrderServiceHwang {
         } else {    //  젤리스틱 작업지시 생성
             for (int i = 0; i < 6; i++) {
                 WorkOrder workOrder = new WorkOrder();
+                workOrder.setPlan(plan);
                 workOrder.setWorkOrderType(ProductType.JELLY);
                 switch (i) {
                     case 0: //  혼합
@@ -205,4 +206,5 @@ public class WorkOrderServiceHwang {
         }
         return deletedWorkOrderNo;
     }
+
 }
