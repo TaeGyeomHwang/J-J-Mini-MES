@@ -89,7 +89,7 @@ public class WorkOrderServiceHwang {
                         workOrder.setWorkOrderProcessName(ProcessCode.A6);
                         workOrder.setWorkOrderFacilityName(FacilityName.DETECTOR);
                         workOrder.setWorkOrderInput(workOrderInput);
-                        workOrder.setWorkOrderOutput(workOrderInput);
+                        workOrder.setWorkOrderOutput(workOrderInput- (long)Math.ceil(workOrderInput*0.03));
                         workOrder.setWorkOrderStartDate(planStartDate);
                         //  검사에 필요한 시간 계산 (시간)
                         long detectProductionTimeInHours = (long) Math.ceil((double) workOrderInput / 5000);
@@ -99,7 +99,7 @@ public class WorkOrderServiceHwang {
                         workOrder.setWorkOrderProcessName(ProcessCode.A7);
                         workOrder.setWorkOrderFacilityName(FacilityName.BOX_WRAPPER);
                         //  투입량 계산
-                        long boxProductionAmount = plan.getPlanProductionAmount();
+                        long boxProductionAmount = plan.getPlanProductionAmount() - (long) Math.ceil(plan.getPlanProductionAmount()*0.03);
                         workOrder.setWorkOrderInput(boxProductionAmount * 30);
                         workOrder.setWorkOrderOutput(boxProductionAmount);
                         workOrder.setWorkOrderStartDate(planStartDate);
@@ -145,7 +145,7 @@ public class WorkOrderServiceHwang {
                         //  투입량 계산
                         long wrapProductionAmount = plan.getPlanProductionAmount() * 25;
                         workOrder.setWorkOrderInput(workOrderInput);
-                        workOrder.setWorkOrderOutput(wrapProductionAmount);
+                        workOrder.setWorkOrderOutput(wrapProductionAmount- (long)Math.ceil(wrapProductionAmount*0.03));
                         workOrder.setWorkOrderStartDate(planStartDate);
                         //  충진에 필요한 시간 계산 (시간)
                         long wrapProductionTimeInHours = (long) Math.ceil((double) wrapProductionAmount / 2000);
@@ -163,7 +163,7 @@ public class WorkOrderServiceHwang {
                         workOrder.setWorkOrderProcessName(ProcessCode.B5);
                         workOrder.setWorkOrderFacilityName(FacilityName.DETECTOR);
                         workOrder.setWorkOrderInput(workOrderInput);
-                        workOrder.setWorkOrderOutput(workOrderInput);
+                        workOrder.setWorkOrderOutput(workOrderInput- (long)Math.ceil(workOrderInput*0.03));
                         workOrder.setWorkOrderStartDate(planStartDate);
                         //  검사에 필요한 시간 계산 (시간)
                         long detectProductionTimeInHours = (long) Math.ceil((double) workOrderInput / 5000);
@@ -173,7 +173,7 @@ public class WorkOrderServiceHwang {
                         workOrder.setWorkOrderProcessName(ProcessCode.B6);
                         workOrder.setWorkOrderFacilityName(FacilityName.BOX_WRAPPER);
                         //  투입량 계산
-                        long boxProductionAmount = plan.getPlanProductionAmount();
+                        long boxProductionAmount = plan.getPlanProductionAmount() - (long) Math.ceil(plan.getPlanProductionAmount()*0.03);
                         workOrder.setWorkOrderInput(workOrderInput);
                         workOrder.setWorkOrderOutput(boxProductionAmount);
                         workOrder.setWorkOrderStartDate(planStartDate);
