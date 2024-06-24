@@ -128,7 +128,12 @@
                 "columns": [
                     { "data": "planNo" },
                     { "data": "planProductType" },
-                    { "data": "planAmount" },
+                    {
+                        "data": "planAmount",
+                        "render": function (data, type, row) {
+                            return data + " Box";
+                        }
+                    },
                     {
                         "data": "planStartDate",
                         "render": function (data, type, row) {
@@ -179,4 +184,5 @@
         });
     </script>
 </th:block>
+
 </html>
