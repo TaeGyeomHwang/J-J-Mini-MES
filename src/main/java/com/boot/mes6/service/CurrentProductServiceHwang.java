@@ -20,25 +20,25 @@ public class CurrentProductServiceHwang {
         CurrentProduct cabbageJuice = new CurrentProduct();
         cabbageJuice.setCurrentProductName(ProductName.CABBAGE_JUICE);
         cabbageJuice.setCurrentProductAmount(0L);
-        cabbageJuice.setCurrentProductSafeAmount(0L);
+        cabbageJuice.setCurrentProductSafeAmount(1000L);
         currentProductRepositoryHwang.save(cabbageJuice);
 
         CurrentProduct garlicJuice = new CurrentProduct();
         garlicJuice.setCurrentProductName(ProductName.GARLIC_JUICE);
         garlicJuice.setCurrentProductAmount(0L);
-        garlicJuice.setCurrentProductSafeAmount(0L);
+        garlicJuice.setCurrentProductSafeAmount(1000L);
         currentProductRepositoryHwang.save(garlicJuice);
 
         CurrentProduct pomegranateJelly = new CurrentProduct();
         pomegranateJelly.setCurrentProductName(ProductName.POMEGRANATE_JELLY);
         pomegranateJelly.setCurrentProductAmount(0L);
-        pomegranateJelly.setCurrentProductSafeAmount(0L);
+        pomegranateJelly.setCurrentProductSafeAmount(1000L);
         currentProductRepositoryHwang.save(pomegranateJelly);
 
         CurrentProduct plumJelly = new CurrentProduct();
         plumJelly.setCurrentProductName(ProductName.PLUM_JELLY);
         plumJelly.setCurrentProductAmount(0L);
-        plumJelly.setCurrentProductSafeAmount(0L);
+        plumJelly.setCurrentProductSafeAmount(1000L);
         currentProductRepositoryHwang.save(plumJelly);
     }
 
