@@ -40,7 +40,6 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
         <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">원자재 입출고 관리</h1>
-        <a href="/materialAdd" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">발주 추가</a>
     </div>
     <table id="Material_in_out_table" class="display">
         <thead>
@@ -55,7 +54,6 @@
             <th>출고일</th>
             <th>보관기한</th>
             <th>상태</th>
-            <th>취소하기</th>
         </tr>
         </thead>
         <tbody>
@@ -64,16 +62,12 @@
             <td th:text="${material.materialName.getDescription()}"></td>
             <td th:text="${material.materialInoutAmount}"></td>
             <td th:text="${material.materialSupplierName.getDescription()}"></td>
-            <td th:text="${material.materialOrderDate}"></td>
-            <td th:text="${material.materialReceiptDate}"></td>
-            <td th:text="${material.materialInDate}"></td>
-            <td th:text="${material.materialOutDate}"></td>
-            <td th:text="${material.materialExpireDate}"></td>
+            <td th:text="${#temporals.format(material.materialOrderDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td th:text="${#temporals.format(material.materialReceiptDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td th:text="${#temporals.format(material.materialInDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td th:text="${#temporals.format(material.materialOutDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td th:text="${#temporals.format(material.materialExpireDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
             <td th:text="${material.materialStatus.getDescription()}"></td>
-            <td th:if="${material.materialStatus eq 'PREPARING_SHIP'}">
-                <button>취소하기</button>
-            </td>
-            <td th:unless="${material.materialStatus eq 'PREPARING_SHIP'}"></td>
         </tr>
         </tbody>
 
@@ -84,7 +78,9 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 <script>
     $(document).ready( function () {
-        let MaterialTable = $('#Material_in_out_table').DataTable({
+        $('#Material_in_out_table').DataTable({
+            paging: true,
+            pageLength: 5
 
         });
     });

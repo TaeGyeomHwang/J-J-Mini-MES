@@ -24,6 +24,10 @@ public class TimeController {
     @PostMapping("/increaseTime")
     public ResponseEntity<Void> increaseTime(@RequestParam int minutes) {
         timeService.increaseTime(minutes);
+
+        //발주한 원자재 배송 중인지, 도착했는지 원자재 상태 변경하는 메서드
+        timeService.setMaterialStatus();
+
         return ResponseEntity.ok().build();
     }
 

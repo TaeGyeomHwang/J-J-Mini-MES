@@ -29,13 +29,13 @@ public class MESApiController {
     //수동 원자재 발주 추가
     //아직 미완성
     @PostMapping("/AddMaterial")
-    public ResponseEntity<AddMaterial> addMaterial(@RequestBody AddMaterial addMaterial) {
+    public ResponseEntity<AddMaterial> ManualAddMaterial(@RequestBody AddMaterial addMaterial) {
         //System.out.println("good");
         LocalDateTime currentTime = timeService.getCurrentTime();
 
-        System.out.println("1 : " + addMaterial.getMaterialName());
-        System.out.println("2 : " + addMaterial.getMaterialInoutAmount());
-        System.out.println("3 : " + addMaterial.getMaterialSupplierName());
+        //System.out.println("1 : " + addMaterial.getMaterialName());
+        //System.out.println("2 : " + addMaterial.getMaterialInoutAmount());
+        //System.out.println("3 : " + addMaterial.getMaterialSupplierName());
 
         MaterialInOut materialInOut = new MaterialInOut();
         materialInOut.setMaterialName(addMaterial.getMaterialName());
@@ -60,7 +60,7 @@ public class MESApiController {
         LocalDateTime currentTime = timeService.getCurrentTime();
 
         Order order = new Order();
-        order.setOrderNo(2L);
+        order.setOrderNo(4L);
         order.setOrderType(OrderType.COMPANY);
         order.setOrderProductType(ProductName.CABBAGE_JUICE);
         order.setOrderAmount(1000L);

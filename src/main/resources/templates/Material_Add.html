@@ -25,6 +25,7 @@
 
 <div layout:fragment="content" class="container-fluid">
     <h1>발주 추가</h1>
+    <h1>원자재 수동 발주 페이지인데 이제 없는거임</h1>
     <br>
     <h3>원자재명</h3>
     <select id="MaterialName" class="form-select">
@@ -83,7 +84,7 @@
                 }
             });
 
-            // test
+            // 원자재 수동 발주
             document.getElementById('submit').addEventListener('click', function() {
                 var data = {
                     materialName: document.getElementById('MaterialName').value,
