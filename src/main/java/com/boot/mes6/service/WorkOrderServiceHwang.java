@@ -220,7 +220,6 @@ public class WorkOrderServiceHwang {
             if (workOrder.getWorkOrderProcessName() == ProcessCode.A1 | workOrder.getWorkOrderProcessName() == ProcessCode.B1) {
                 List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findListByPlanNo(workOrder.getPlan().getPlanNo());
                 for (OrderPlanMap orderPlanMap : orderPlanMapList) {
-                    System.out.println("생산 시작한 수주의 번호: "+orderPlanMap.getOrder().getOrderNo());
                     Long orderNo = orderPlanMap.getOrder().getOrderNo();
                     Order foundOrder = orderRepositoryHwang.findById(orderNo)
                             .orElseThrow(EntityNotFoundException::new);
@@ -236,11 +235,23 @@ public class WorkOrderServiceHwang {
         return workOrderNoList;
     }
 
-    //  작업지시 완료로 변경
+    //  작업지시 완료로 변경 & 전처리 및 혼합 작업지시가 바로 완료될 경우 수주 상태 처리
     public List<Long> setWorkOrderStatusComplete() {
         List<Long> workOrderNoList = new ArrayList<>();
         List<WorkOrder> workOrderWaiting = workOrderRepositoryHwang.findProcessingOrWaitingWorkOrdersWithCurrentTimeAfterExpectDate();
         for (WorkOrder workOrder : workOrderWaiting) {
+            //  해당 작업지시가 전처리 또는 혼합 공정이라면
+            if(workOrder.getWorkOrderProcessName() == ProcessCode.A1 | workOrder.getWorkOrderProcessName() == ProcessCode.B1){
+                List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findListByPlanNo(workOrder.getPlan().getPlanNo());
+                for (OrderPlanMap orderPlanMap : orderPlanMapList) {
+                    Long orderNo = orderPlanMap.getOrder().getOrderNo();
+                    Order foundOrder = orderRepositoryHwang.findById(orderNo)
+                            .orElseThrow(EntityNotFoundException::new);
+                    foundOrder.setOrderStatus(OrderStatus.IN_PRODUCTION);
+
+                    orderRepositoryHwang.save(foundOrder);
+                }
+            }
             //  해당 작업지시가 포장 공정이라면
             if (workOrder.getWorkOrderProcessName() == ProcessCode.A7 | workOrder.getWorkOrderProcessName() == ProcessCode.B6) {
                 List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findFilteredByPlanNo(workOrder.getPlan().getPlanNo());
