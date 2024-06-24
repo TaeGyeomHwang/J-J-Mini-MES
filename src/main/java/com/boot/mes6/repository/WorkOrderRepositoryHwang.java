@@ -27,4 +27,20 @@ public interface WorkOrderRepositoryHwang extends JpaRepository<WorkOrder, Long>
     // 특정 제품 종류를 생산하면서 주어진 날짜 범위 내에 있는 작업지시 페이징해서 찾기
     Page<WorkOrder> findByWorkOrderTypeAndWorkOrderStartDateBetween(
             ProductType workOrderType, LocalDateTime startDate, LocalDateTime endDate, PageRequest pageRequest);
+
+    // waiting 상태이고 currentTimeValue가 WorkOrderStartDate와 workOrderExpectDate 사이인 값 찾기
+    @Query("SELECT w FROM WorkOrder w " +
+            "JOIN CurrentTime c ON c.currentTimeNo = 1 " +
+            "WHERE w.workOrderStatus = 'WAITING' " +
+            "AND c.currentTimeValue BETWEEN w.workOrderStartDate AND w.workOrderExpectDate")
+    List<WorkOrder> findWaitingWorkOrdersWithCurrentTimeInRange();
+
+    // processing 또는 waiting 상태이고 currentTimeValue가 workOrderExpectDate 이상인 값 찾기
+    @Query("SELECT w FROM WorkOrder w " +
+            "JOIN CurrentTime c ON c.currentTimeNo = 1 " +
+            "WHERE (w.workOrderStatus = 'PROCESSING' OR w.workOrderStatus = 'WAITING') " +
+            "AND c.currentTimeValue >= w.workOrderExpectDate")
+    List<WorkOrder> findProcessingOrWaitingWorkOrdersWithCurrentTimeAfterExpectDate();
+
+
 }
