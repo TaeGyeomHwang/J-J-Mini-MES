@@ -223,9 +223,11 @@ public class WorkOrderServiceHwang {
                     Long orderNo = orderPlanMap.getOrder().getOrderNo();
                     Order foundOrder = orderRepositoryHwang.findById(orderNo)
                             .orElseThrow(EntityNotFoundException::new);
-                    foundOrder.setOrderStatus(OrderStatus.IN_PRODUCTION);
-
-                    orderRepositoryHwang.save(foundOrder);
+                    if (foundOrder.getOrderStatus() != OrderStatus.SHIPPED) {
+                        foundOrder.setOrderStatus(OrderStatus.IN_PRODUCTION);
+                        orderRepositoryHwang.save(foundOrder);
+                    }
+                    /*  여기에 원자재 자동 출고 메소드 삽입*/
                 }
             }
             workOrder.setWorkOrderStatus(WorkOrderStatus.PROCESSING);
@@ -241,26 +243,34 @@ public class WorkOrderServiceHwang {
         List<WorkOrder> workOrderWaiting = workOrderRepositoryHwang.findProcessingOrWaitingWorkOrdersWithCurrentTimeAfterExpectDate();
         for (WorkOrder workOrder : workOrderWaiting) {
             //  해당 작업지시가 전처리 또는 혼합 공정이라면
-            if(workOrder.getWorkOrderProcessName() == ProcessCode.A1 | workOrder.getWorkOrderProcessName() == ProcessCode.B1){
+            if (workOrder.getWorkOrderProcessName() == ProcessCode.A1 | workOrder.getWorkOrderProcessName() == ProcessCode.B1) {
                 List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findListByPlanNo(workOrder.getPlan().getPlanNo());
                 for (OrderPlanMap orderPlanMap : orderPlanMapList) {
                     Long orderNo = orderPlanMap.getOrder().getOrderNo();
                     Order foundOrder = orderRepositoryHwang.findById(orderNo)
                             .orElseThrow(EntityNotFoundException::new);
-                    foundOrder.setOrderStatus(OrderStatus.IN_PRODUCTION);
-
-                    orderRepositoryHwang.save(foundOrder);
+                    if (foundOrder.getOrderStatus() != OrderStatus.SHIPPED) {
+                        foundOrder.setOrderStatus(OrderStatus.IN_PRODUCTION);
+                        orderRepositoryHwang.save(foundOrder);
+                    }
+                    /*  여기에 원자재 자동 출고 메소드 삽입  */
                 }
             }
             //  해당 작업지시가 포장 공정이라면
             if (workOrder.getWorkOrderProcessName() == ProcessCode.A7 | workOrder.getWorkOrderProcessName() == ProcessCode.B6) {
                 List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findFilteredByPlanNo(workOrder.getPlan().getPlanNo());
-                if (orderPlanMapList.size()!=0){
-                    for (OrderPlanMap orderPlanMap : orderPlanMapList){
+                if (orderPlanMapList.size() != 0) {
+                    for (OrderPlanMap orderPlanMap : orderPlanMapList) {
                         Order foundOrder = orderPlanMap.getOrder();
-                        foundOrder.setOrderStatus(OrderStatus.SHIPPED);
-                        foundOrder.setOrderOutDate(foundOrder.getOrderExpectShipDate());
-                        orderRepositoryHwang.save(foundOrder);
+                        //  이미 출고된 수주인지 확인
+                        if (foundOrder.getOrderStatus() != OrderStatus.SHIPPED) {
+                            foundOrder.setOrderStatus(OrderStatus.SHIPPED);
+                            foundOrder.setOrderOutDate(foundOrder.getOrderExpectShipDate());
+                            orderRepositoryHwang.save(foundOrder);
+                            /*  여기에 완제품 입고 및 출고 메소드 삽입  */
+                        } else {
+                            /*  여기에 완제품 입고 메소드 삽입   */
+                        }
                     }
                 }
             }

@@ -89,6 +89,10 @@ public class OrderController {
         try {
             //  수주 추가
             Long orderNo = orderServiceHwang.saveOrderManual(orderFormDto);
+            if (orderNo == -1L){
+                model.addAttribute("errorMessage", "안전 재고량이 부족합니다.");
+                return "order/orderAdd";
+            }
 
             //  생산계획 추가 또는 합병
             Order order = orderRepositoryHwang.findById(orderNo)

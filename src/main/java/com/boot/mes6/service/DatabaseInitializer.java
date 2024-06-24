@@ -10,9 +10,11 @@ import org.springframework.stereotype.Component;
 class DatabaseInitializer implements ApplicationRunner {
 
     private final CurrentTimeServiceHwang currentTimeServiceHwang;
+    private final CurrentProductServiceHwang currentProductServiceHwang;
 
     @Override
     public void run(ApplicationArguments args) {
         currentTimeServiceHwang.initializeCurrentTime();
+        currentProductServiceHwang.initializeCurrentProduct();
     }
 }
