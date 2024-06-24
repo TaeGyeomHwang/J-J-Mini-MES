@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>충진카운트 현황</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+</head>
+
+<th:block layout:fragment="css">
+    <style>
+        .container-fluid {
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #myTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #myTable th, #myTable td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+
+        #myTable th {
+            background-color: #f2f2f2;
+        }
+
+        .btn {
+            margin-bottom: 10px;
+        }
+
+        .dataTables_filter {
+            display: none;
+        }
+
+        .dataTables_info {
+            display: none;
+        }
+
+        .dataTables_length {
+            display: none;
+        }
+
+        .dataTables_paginate {
+            display: none;
+        }
+
+        #currentTime {
+            font-weight: bold;
+        }
+
+        .refresh-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content" class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
+        <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">충진카운트 현황</h1>
+    </div>
+    <div class="refresh-container">
+        <div id="currentTime">현재 시간: </div>
+        <button id="refreshButton" class="btn btn-primary">갱신</button>
+    </div>
+    <table id="myTable" class="display">
+        <thead>
+        <tr>
+            <th>포장기</th>
+            <th>시작 시간</th>
+            <th>목표량</th>
+            <th>정상 카운트</th>
+            <th>불량 카운트</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<th:block layout:fragment="script">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function () {
+            function fetchCurrentTime() {
+                $.ajax({
+                    url: '/api/currentTime', // Your API endpoint to get the current time
+                    type: 'GET',
+                    success: function (response) {
+                        var formattedTime = formatDate(response.currentTime);
+                        $('#currentTime').text('현재 시간: ' + formattedTime);
+                    },
+                    error: function () {
+                        console.error('Failed to fetch current time.');
+                    }
+                });
+            }
+
+            function updateCurrentTime() {
+                var now = new Date();
+                var formattedTime = formatDate(now.toISOString());
+                $('#currentTime').text('현재 시간: ' + formattedTime);
+            }
+
+            $('#myTable').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "/api/report/wrapper/progress",
+                    "type": "GET",
+                    "data": function (params) {
+                        return {
+                            draw: params.draw,
+                            start: params.start,
+                            length: params.length
+                        };
+                    },
+                    "dataSrc": "data"
+                },
+                "columns": [
+                    { "data": "wrapperName" },
+                    {
+                        "data": "wrapperStartDate",
+                        "render": function (data, type, row) {
+                            return data ? formatDate(data) : '-';
+                        }
+                    },
+                    { "data": "wrapperTotalCount" },
+                    { "data": "wrapperPassed" },
+                    { "data": "wrapperFailure" }
+                ],
+                "paging": true,
+                "lengthMenu": [ 10, 25, 50, 100 ],
+                "pageLength": 10,
+                "language": {
+                    "lengthMenu": "_MENU_ 개 단위",
+                    "info": "전체 _TOTAL_개, _START_부터 _END_까지",
+                    "paginate": {
+                        "previous": "이전",
+                        "next": "이후"
+                    }
+                }
+            });
+
+            $('#refreshButton').on('click', function () {
+                $('#myTable').DataTable().ajax.reload();
+                fetchCurrentTime();
+            });
+
+            function formatDate(dateString) {
+                var date = new Date(dateString);
+                var day = date.getDate();
+                var month = date.getMonth() + 1;
+                var year = date.getFullYear() % 100;
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var seconds = date.getSeconds();
+
+                return `${year.toString().padStart(2, '0')}.${month}.${day} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            fetchCurrentTime();
+            setInterval(updateCurrentTime, 60000);
+        });
+    </script>
+</th:block>
+</html>

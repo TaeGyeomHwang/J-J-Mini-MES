@@ -1,5 +1,6 @@
 package com.boot.mes6.repository;
 
+import com.boot.mes6.constant.FacilityName;
 import com.boot.mes6.constant.ProductType;
 import com.boot.mes6.entity.WorkOrder;
 import org.springframework.data.domain.Page;
@@ -42,5 +43,20 @@ public interface WorkOrderRepositoryHwang extends JpaRepository<WorkOrder, Long>
             "AND c.currentTimeValue >= w.workOrderExpectDate")
     List<WorkOrder> findProcessingOrWaitingWorkOrdersWithCurrentTimeAfterExpectDate();
 
+    //  충진이 진행 또는 대기중인 시설 찾기
+    @Query(value = "SELECT * FROM work_order w WHERE w.work_order_no IN (" +
+            "SELECT MIN(w1.work_order_no) FROM work_order w1 " +
+            "WHERE w1.work_order_status IN ('PROCESSING', 'WAITING') " +
+            "AND (w1.work_order_facility_name = 'JUICE_WRAPPER_1' " +
+            "OR w1.work_order_facility_name = 'JUICE_WRAPPER_2' " +
+            "OR w1.work_order_facility_name = 'JELLY_WRAPPER_1' " +
+            "OR w1.work_order_facility_name = 'JELLY_WRAPPER_2') " +
+            "GROUP BY w1.work_order_facility_name)", nativeQuery = true)
+    List<WorkOrder> findWrapperWorkOrders();
+
+
+    List<WorkOrder> findTop12ByWorkOrderFacilityNameInOrderByWorkOrderNoAsc(FacilityName... facilityNames);
+
+    List<WorkOrder> findByWorkOrderFacilityNameInOrderByWorkOrderNoAsc(FacilityName... facilityNames);
 
 }

@@ -12,7 +12,6 @@ import com.boot.mes6.repository.WorkOrderRepositoryHwang;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -280,5 +279,37 @@ public class WorkOrderServiceHwang {
             workOrderNoList.add(workOrder.getWorkOrderNo());
         }
         return workOrderNoList;
+    }
+
+    public List<WorkOrder> getWrapperWorkOrders() {
+        return workOrderRepositoryHwang.findWrapperWorkOrders();
+    }
+
+    public List<WorkOrder> getFacilityWorkOrders() {
+        return workOrderRepositoryHwang.findTop12ByWorkOrderFacilityNameInOrderByWorkOrderNoAsc(
+                FacilityName.JUICE_WRAPPER_1,
+                FacilityName.JUICE_WRAPPER_2,
+                FacilityName.JELLY_WRAPPER_1,
+                FacilityName.JELLY_WRAPPER_2,
+                FacilityName.EXTRACTOR_1,
+                FacilityName.EXTRACTOR_2,
+                FacilityName.STERILIZER_1,
+                FacilityName.STERILIZER_2,
+                FacilityName.MIXER,
+                FacilityName.FILTER,
+                FacilityName.BOX_WRAPPER,
+                FacilityName.DETECTOR
+        );
+    }
+
+    public List<WorkOrder> getCapaWorkOrders() {
+        return workOrderRepositoryHwang.findByWorkOrderFacilityNameInOrderByWorkOrderNoAsc(
+                FacilityName.EXTRACTOR_1,
+                FacilityName.EXTRACTOR_2,
+                FacilityName.STERILIZER_1,
+                FacilityName.STERILIZER_2,
+                FacilityName.MIXER,
+                FacilityName.FILTER
+        );
     }
 }

@@ -51,15 +51,15 @@ public class OrderController {
         List<OrderDto> orderDtos = ordersPage.getContent().stream()
                 .map(order -> new OrderDto(
                         order.getOrderNo(),
-                        order.getOrderType().getDescription(), // Assuming OrderType has getDescription() method
-                        order.getOrderProductType().getDescription(), // Assuming OrderProductType has getDescription() method
+                        order.getOrderType().getDescription(),
+                        order.getOrderProductType().getDescription(),
                         order.getOrderAmount(),
                         order.getOrderCustomerName(),
                         order.getOrderDate(),
                         order.getOrderExpectShipDate(),
                         order.getOrderOutDate(),
                         order.isOrderIsEmergency(),
-                        order.getOrderStatus().getDescription() // Assuming OrderStatus has getDescription() method
+                        order.getOrderStatus().getDescription()
                 ))
                 .collect(Collectors.toList());
 
