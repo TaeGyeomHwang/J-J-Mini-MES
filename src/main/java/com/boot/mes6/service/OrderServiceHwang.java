@@ -40,27 +40,45 @@ public class OrderServiceHwang {
         return orderRepositoryHwang.findAll(pageable);
     }
 
-    //  더미 수주 추가
-    public Long saveOrder() {
-        Order order = new Order();
-
-        order.setOrderType(OrderType.COMPANY);
-        order.setOrderProductType(ProductName.CABBAGE_JUICE);
-        order.setOrderAmount(123L);
-        order.setOrderCustomerName("xx식품");
-        order.setOrderDate(LocalDateTime.now());
-        System.out.println("현재시각: " + LocalDateTime.now());
-        order.setOrderIsEmergency(false);
-        order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
-
-        orderRepositoryHwang.save(order);
-
-        return order.getOrderNo();
-    }
-
     //  수주 수동 추가
     public Long saveOrderManual(OrderFormDto orderFormDto) {
         Order order = new Order();
+        OrderType orderType = orderFormDto.getOrderType();
+        switch (orderType){
+            case COMPANY:
+                order.setOrderType(orderFormDto.getOrderType());
+                order.setOrderProductType(orderFormDto.getProductName());
+                order.setOrderAmount(orderFormDto.getOrderAmount());
+                order.setOrderCustomerName(orderFormDto.getOrderCustomerName());
+                CurrentTime currentTime = currentTimeRepositoryHwang.findById(1L)
+                        .orElseThrow(EntityNotFoundException::new);
+                order.setOrderDate(currentTime.getCurrentTimeValue());
+                if (order.isOrderIsEmergency()){
+                    order.setOrderIsEmergency(order.isOrderIsEmergency());
+                    order.setOrderStatus(OrderStatus.SHIPPED);
+                }else {
+                    order.setOrderIsEmergency(order.isOrderIsEmergency());
+                    order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
+                }
+                orderRepositoryHwang.save(order);
+            case GENERAL:
+                order.setOrderType(orderFormDto.getOrderType());
+                order.setOrderProductType(orderFormDto.getProductName());
+                order.setOrderAmount(orderFormDto.getOrderAmount());
+                order.setOrderCustomerName(orderFormDto.getOrderCustomerName());
+                currentTime = currentTimeRepositoryHwang.findById(1L)
+                        .orElseThrow(EntityNotFoundException::new);
+                order.setOrderDate(currentTime.getCurrentTimeValue());
+                if (order.isOrderIsEmergency()){
+                    order.setOrderIsEmergency(order.isOrderIsEmergency());
+                    order.setOrderStatus(OrderStatus.SHIPPED);
+                }else {
+                    order.setOrderIsEmergency(order.isOrderIsEmergency());
+                    order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
+                }
+
+                orderRepositoryHwang.save(order);
+        }
         order.setOrderType(orderFormDto.getOrderType());
         order.setOrderProductType(orderFormDto.getProductName());
         order.setOrderAmount(orderFormDto.getOrderAmount());
