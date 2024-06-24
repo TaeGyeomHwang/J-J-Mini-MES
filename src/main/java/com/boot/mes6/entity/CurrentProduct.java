@@ -12,7 +12,7 @@ import lombok.Setter;
 public class CurrentProduct {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Enumerated(EnumType.STRING)
     private ProductName currentProductName;
 
     @Column(nullable = false)
