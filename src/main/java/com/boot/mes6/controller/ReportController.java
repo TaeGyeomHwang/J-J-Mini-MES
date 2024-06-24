@@ -197,10 +197,10 @@ public class ReportController {
                 // Update status and progress if necessary (e.g., for ongoing work orders)
                 FacilityDto existingDto = facilityDtoMap.get(facilityName);
                 if (facilityStatus.equals("가동중")) {
-                    existingDto.setStatus("가동중");
+                    existingDto.setFacilityStatus("가동중");
                 }
                 if (progress > 0.0) {
-                    existingDto.setProgress(String.format("%.2f%%", progress));
+                    existingDto.setFacilityProgress(String.format("%.2f%%", progress));
                 }
             }
         });
