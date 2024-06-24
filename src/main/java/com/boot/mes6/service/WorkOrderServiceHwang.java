@@ -1,16 +1,18 @@
 package com.boot.mes6.service;
 
-import com.boot.mes6.constant.FacilityName;
-import com.boot.mes6.constant.ProcessCode;
-import com.boot.mes6.constant.ProductType;
-import com.boot.mes6.constant.WorkOrderStatus;
+import com.boot.mes6.constant.*;
+import com.boot.mes6.entity.Order;
+import com.boot.mes6.entity.OrderPlanMap;
 import com.boot.mes6.entity.Plan;
 import com.boot.mes6.entity.WorkOrder;
+import com.boot.mes6.repository.OrderPlanMapRepositoryHwang;
+import com.boot.mes6.repository.OrderRepositoryHwang;
 import com.boot.mes6.repository.PlanRepositoryHwang;
 import com.boot.mes6.repository.WorkOrderRepositoryHwang;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +26,8 @@ public class WorkOrderServiceHwang {
 
     private final PlanRepositoryHwang planRepository;
     private final WorkOrderRepositoryHwang workOrderRepositoryHwang;
+    private final OrderPlanMapRepositoryHwang orderPlanMapRepositoryHwang;
+    private final OrderRepositoryHwang orderRepositoryHwang;
 
     //  작업지시 생성
     public List<Long> createNewWorkOrder(Long planNo, ProductType productType) {
@@ -89,7 +93,7 @@ public class WorkOrderServiceHwang {
                         workOrder.setWorkOrderProcessName(ProcessCode.A6);
                         workOrder.setWorkOrderFacilityName(FacilityName.DETECTOR);
                         workOrder.setWorkOrderInput(workOrderInput);
-                        workOrder.setWorkOrderOutput(workOrderInput- (long)Math.ceil(workOrderInput*0.03));
+                        workOrder.setWorkOrderOutput(workOrderInput - (long) Math.ceil(workOrderInput * 0.03));
                         workOrder.setWorkOrderStartDate(planStartDate);
                         //  검사에 필요한 시간 계산 (시간)
                         long detectProductionTimeInHours = (long) Math.ceil((double) workOrderInput / 5000);
@@ -99,7 +103,7 @@ public class WorkOrderServiceHwang {
                         workOrder.setWorkOrderProcessName(ProcessCode.A7);
                         workOrder.setWorkOrderFacilityName(FacilityName.BOX_WRAPPER);
                         //  투입량 계산
-                        long boxProductionAmount = plan.getPlanProductionAmount() - (long) Math.ceil(plan.getPlanProductionAmount()*0.03);
+                        long boxProductionAmount = plan.getPlanProductionAmount() - (long) Math.ceil(plan.getPlanProductionAmount() * 0.03);
                         workOrder.setWorkOrderInput(boxProductionAmount * 30);
                         workOrder.setWorkOrderOutput(boxProductionAmount);
                         workOrder.setWorkOrderStartDate(planStartDate);
@@ -145,7 +149,7 @@ public class WorkOrderServiceHwang {
                         //  투입량 계산
                         long wrapProductionAmount = plan.getPlanProductionAmount() * 25;
                         workOrder.setWorkOrderInput(workOrderInput);
-                        workOrder.setWorkOrderOutput(wrapProductionAmount- (long)Math.ceil(wrapProductionAmount*0.03));
+                        workOrder.setWorkOrderOutput(wrapProductionAmount - (long) Math.ceil(wrapProductionAmount * 0.03));
                         workOrder.setWorkOrderStartDate(planStartDate);
                         //  충진에 필요한 시간 계산 (시간)
                         long wrapProductionTimeInHours = (long) Math.ceil((double) wrapProductionAmount / 2000);
@@ -163,7 +167,7 @@ public class WorkOrderServiceHwang {
                         workOrder.setWorkOrderProcessName(ProcessCode.B5);
                         workOrder.setWorkOrderFacilityName(FacilityName.DETECTOR);
                         workOrder.setWorkOrderInput(workOrderInput);
-                        workOrder.setWorkOrderOutput(workOrderInput- (long)Math.ceil(workOrderInput*0.03));
+                        workOrder.setWorkOrderOutput(workOrderInput - (long) Math.ceil(workOrderInput * 0.03));
                         workOrder.setWorkOrderStartDate(planStartDate);
                         //  검사에 필요한 시간 계산 (시간)
                         long detectProductionTimeInHours = (long) Math.ceil((double) workOrderInput / 5000);
@@ -173,7 +177,7 @@ public class WorkOrderServiceHwang {
                         workOrder.setWorkOrderProcessName(ProcessCode.B6);
                         workOrder.setWorkOrderFacilityName(FacilityName.BOX_WRAPPER);
                         //  투입량 계산
-                        long boxProductionAmount = plan.getPlanProductionAmount() - (long) Math.ceil(plan.getPlanProductionAmount()*0.03);
+                        long boxProductionAmount = plan.getPlanProductionAmount() - (long) Math.ceil(plan.getPlanProductionAmount() * 0.03);
                         workOrder.setWorkOrderInput(workOrderInput);
                         workOrder.setWorkOrderOutput(boxProductionAmount);
                         workOrder.setWorkOrderStartDate(planStartDate);
@@ -207,4 +211,53 @@ public class WorkOrderServiceHwang {
         return deletedWorkOrderNo;
     }
 
+    //  작업지시 진행중으로 변경
+    public List<Long> setWorkOrderStatusProcessing() {
+        List<Long> workOrderNoList = new ArrayList<>();
+        List<WorkOrder> workOrderWaiting = workOrderRepositoryHwang.findWaitingWorkOrdersWithCurrentTimeInRange();
+        for (WorkOrder workOrder : workOrderWaiting) {
+            //  만약 전처리 또는 혼합 공정이라면
+            if (workOrder.getWorkOrderProcessName() == ProcessCode.A1 | workOrder.getWorkOrderProcessName() == ProcessCode.B1) {
+                List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findListByPlanNo(workOrder.getPlan().getPlanNo());
+                for (OrderPlanMap orderPlanMap : orderPlanMapList) {
+                    System.out.println("생산 시작한 수주의 번호: "+orderPlanMap.getOrder().getOrderNo());
+                    Long orderNo = orderPlanMap.getOrder().getOrderNo();
+                    Order foundOrder = orderRepositoryHwang.findById(orderNo)
+                            .orElseThrow(EntityNotFoundException::new);
+                    foundOrder.setOrderStatus(OrderStatus.IN_PRODUCTION);
+
+                    orderRepositoryHwang.save(foundOrder);
+                }
+            }
+            workOrder.setWorkOrderStatus(WorkOrderStatus.PROCESSING);
+            workOrderRepositoryHwang.save(workOrder);
+            workOrderNoList.add(workOrder.getWorkOrderNo());
+        }
+        return workOrderNoList;
+    }
+
+    //  작업지시 완료로 변경
+    public List<Long> setWorkOrderStatusComplete() {
+        List<Long> workOrderNoList = new ArrayList<>();
+        List<WorkOrder> workOrderWaiting = workOrderRepositoryHwang.findProcessingOrWaitingWorkOrdersWithCurrentTimeAfterExpectDate();
+        for (WorkOrder workOrder : workOrderWaiting) {
+            //  해당 작업지시가 포장 공정이라면
+            if (workOrder.getWorkOrderProcessName() == ProcessCode.A7 | workOrder.getWorkOrderProcessName() == ProcessCode.B6) {
+                List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findFilteredByPlanNo(workOrder.getPlan().getPlanNo());
+                if (orderPlanMapList.size()!=0){
+                    for (OrderPlanMap orderPlanMap : orderPlanMapList){
+                        Order foundOrder = orderPlanMap.getOrder();
+                        foundOrder.setOrderStatus(OrderStatus.SHIPPED);
+                        foundOrder.setOrderOutDate(foundOrder.getOrderExpectShipDate());
+                        orderRepositoryHwang.save(foundOrder);
+                    }
+                }
+            }
+            workOrder.setWorkOrderStatus(WorkOrderStatus.COMPLETE);
+            workOrder.setWorkOrderFinishDate(workOrder.getWorkOrderExpectDate());
+            workOrderRepositoryHwang.save(workOrder);
+            workOrderNoList.add(workOrder.getWorkOrderNo());
+        }
+        return workOrderNoList;
+    }
 }
