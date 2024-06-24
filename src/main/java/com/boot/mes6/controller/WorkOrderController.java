@@ -64,37 +64,32 @@ public class WorkOrderController {
         List<WorkOrderDto> workOrderDtos = workOrdersPage.getContent().stream()
                 .map(workOrder -> {
                     WorkOrderDto workOrderDto = new WorkOrderDto();
-                    System.out.println("생산계획번호:"+workOrder.getPlan().getPlanNo());
                     workOrderDto.setPlanNo(workOrder.getPlan().getPlanNo());
-                    System.out.println("생산계획번호:"+workOrderDto.getPlanNo());
                     workOrderDto.setWorkOrderProcessName(workOrder.getWorkOrderProcessName().getDescription());
                     workOrderDto.setWorkOrderFacilityName(workOrder.getWorkOrderFacilityName().getDescription());
-                    workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput());
-                    workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput());
-                    workOrderDto.setWorkOrderStartDate(workOrder.getWorkOrderStartDate());
-                    workOrderDto.setWorkOrderExpectDate(workOrder.getWorkOrderExpectDate());
-                    workOrderDto.setWorkOrderFinishDate(workOrder.getWorkOrderFinishDate());
-                    workOrderDto.setWorkOrderStatus(workOrder.getWorkOrderStatus().getDescription());
-
-                    Long planNo = workOrder.getPlan().getPlanNo();
-                    List<OrderPlanMap> orderPlanMaps = orderPlanMapRepositoryHwang.findListByPlanNo(planNo);
-                    if (!orderPlanMaps.isEmpty()) {
-                        Long orderNo = orderPlanMaps.get(0).getOrder().getOrderNo();
-                        String productName = orderRepositoryHwang.findById(orderNo)
-                                .orElseThrow(EntityNotFoundException::new).getOrderProductType().getDescription();
-                        workOrderDto.setWorkOrderProductType(productName);
+                    switch (workOrder.getWorkOrderProcessName()) {
+                        case A1, A2, A3, A4:
+                            workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput() + "kg");
+                            workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput() + "kg");
+                            break;
+                        case A5:
+                            workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput() + "ml");
+                            workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput() + "포");
+                            break;
+                        case A6:
+                            workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput() + "포");
+                            workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput() + "포");
+                            break;
+                        case A7:
+                            workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput() + "포");
+                            workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput() + "박스");
+                            break;
                     }
-                    return workOrderDto;
+                    return setWorkOrderDto(workOrder, workOrderDto);
                 })
                 .collect(Collectors.toList());
 
-        DataTableResponse<WorkOrderDto> response = new DataTableResponse<>();
-        response.setDraw(draw);
-        response.setRecordsTotal(workOrdersPage.getTotalElements());
-        response.setRecordsFiltered(workOrdersPage.getTotalElements());
-        response.setData(workOrderDtos);
-
-        return ResponseEntity.ok().body(response);
+        return setDataTableResponseResponseEntity(draw, workOrdersPage, workOrderDtos);
     }
 
     // 젤리 작업지시 목록 조회 페이지
@@ -129,30 +124,36 @@ public class WorkOrderController {
         List<WorkOrderDto> workOrderDtos = workOrdersPage.getContent().stream()
                 .map(workOrder -> {
                     WorkOrderDto workOrderDto = new WorkOrderDto();
-                    System.out.println("생산계획번호:"+workOrder.getPlan().getPlanNo());
                     workOrderDto.setPlanNo(workOrder.getPlan().getPlanNo());
-                    System.out.println("생산계획번호:"+workOrderDto.getPlanNo());
                     workOrderDto.setWorkOrderProcessName(workOrder.getWorkOrderProcessName().getDescription());
                     workOrderDto.setWorkOrderFacilityName(workOrder.getWorkOrderFacilityName().getDescription());
-                    workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput());
-                    workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput());
-                    workOrderDto.setWorkOrderStartDate(workOrder.getWorkOrderStartDate());
-                    workOrderDto.setWorkOrderExpectDate(workOrder.getWorkOrderExpectDate());
-                    workOrderDto.setWorkOrderFinishDate(workOrder.getWorkOrderFinishDate());
-                    workOrderDto.setWorkOrderStatus(workOrder.getWorkOrderStatus().getDescription());
-
-                    Long planNo = workOrder.getPlan().getPlanNo();
-                    List<OrderPlanMap> orderPlanMaps = orderPlanMapRepositoryHwang.findListByPlanNo(planNo);
-                    if (!orderPlanMaps.isEmpty()) {
-                        Long orderNo = orderPlanMaps.get(0).getOrder().getOrderNo();
-                        String productName = orderRepositoryHwang.findById(orderNo)
-                                .orElseThrow(EntityNotFoundException::new).getOrderProductType().getDescription();
-                        workOrderDto.setWorkOrderProductType(productName);
+                    switch (workOrder.getWorkOrderProcessName()) {
+                        case B1, B2:
+                            workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput() + "ml");
+                            workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput() + "ml");
+                            break;
+                        case B3:
+                            workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput() + "ml");
+                            workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput() + "포");
+                            break;
+                        case B4, B5:
+                            workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput() + "포");
+                            workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput() + "포");
+                            break;
+                        case B6:
+                            workOrderDto.setWorkOrderInput(workOrder.getWorkOrderInput() + "포");
+                            workOrderDto.setWorkOrderOutput(workOrder.getWorkOrderOutput() + "박스");
+                            break;
                     }
-                    return workOrderDto;
+                    return setWorkOrderDto(workOrder, workOrderDto);
                 })
                 .collect(Collectors.toList());
 
+        return setDataTableResponseResponseEntity(draw, workOrdersPage, workOrderDtos);
+    }
+
+    //  ResponseEntity 설정
+    private ResponseEntity<DataTableResponse<WorkOrderDto>> setDataTableResponseResponseEntity(@RequestParam(defaultValue = "0") int draw, Page<WorkOrder> workOrdersPage, List<WorkOrderDto> workOrderDtos) {
         DataTableResponse<WorkOrderDto> response = new DataTableResponse<>();
         response.setDraw(draw);
         response.setRecordsTotal(workOrdersPage.getTotalElements());
@@ -160,6 +161,24 @@ public class WorkOrderController {
         response.setData(workOrderDtos);
 
         return ResponseEntity.ok().body(response);
+    }
+
+    //  작업지시 설정
+    private WorkOrderDto setWorkOrderDto(WorkOrder workOrder, WorkOrderDto workOrderDto) {
+        workOrderDto.setWorkOrderStartDate(workOrder.getWorkOrderStartDate());
+        workOrderDto.setWorkOrderExpectDate(workOrder.getWorkOrderExpectDate());
+        workOrderDto.setWorkOrderFinishDate(workOrder.getWorkOrderFinishDate());
+        workOrderDto.setWorkOrderStatus(workOrder.getWorkOrderStatus().getDescription());
+
+        Long planNo = workOrder.getPlan().getPlanNo();
+        List<OrderPlanMap> orderPlanMaps = orderPlanMapRepositoryHwang.findListByPlanNo(planNo);
+        if (!orderPlanMaps.isEmpty()) {
+            Long orderNo = orderPlanMaps.get(0).getOrder().getOrderNo();
+            String productName = orderRepositoryHwang.findById(orderNo)
+                    .orElseThrow(EntityNotFoundException::new).getOrderProductType().getDescription();
+            workOrderDto.setWorkOrderProductType(productName);
+        }
+        return workOrderDto;
     }
 
 }

@@ -12,8 +12,8 @@ public class WorkOrderDto {
     private String workOrderProductType;
     private String workOrderProcessName;
     private String workOrderFacilityName;
-    private Long workOrderInput;
-    private Long workOrderOutput;
+    private String workOrderInput;
+    private String workOrderOutput;
     private LocalDateTime workOrderStartDate;
     private LocalDateTime workOrderExpectDate;
     private LocalDateTime workOrderFinishDate;
