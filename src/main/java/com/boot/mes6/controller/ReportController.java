@@ -159,13 +159,13 @@ public class ReportController {
 
         LocalDateTime currentTime = currentTimeServiceHwang.getCurrentTime();
 
-        // Use a map to aggregate progress and status for each facility
+        // map을 이용하여 시설별 진행상황 및 현황 집계
         Map<String, FacilityDto> facilityDtoMap = new HashMap<>();
 
         workOrders.forEach(workOrder -> {
             String facilityName = workOrder.getWorkOrderFacilityName().getDescription();
 
-            // Determine facility status based on work order status
+            // 작업지시 상태에 따라 설비현황 파악
             String facilityStatus;
             if (workOrder.getWorkOrderStatus() == WorkOrderStatus.WAITING) {
                 facilityStatus = "비가동";
@@ -175,7 +175,7 @@ public class ReportController {
                 facilityStatus = "비가동"; // Default status for other cases
             }
 
-            // Calculate facility progress as percentage of time elapsed
+            // 설비 진척도를 경과한 시간의 백분율로 계산
             LocalDateTime workOrderStartDate = workOrder.getWorkOrderStartDate();
             LocalDateTime workOrderExpectDate = workOrder.getWorkOrderExpectDate();
             long totalDuration = Duration.between(workOrderStartDate, workOrderExpectDate).toMinutes();
@@ -183,18 +183,18 @@ public class ReportController {
 
             double progress;
             if (totalDuration <= 0 || elapsedDuration < 0 || elapsedDuration > totalDuration) {
-                progress = 0.0; // Handle edge cases where duration calculation is invalid
+                progress = 0.0; // 기간 계산이 유효하지 않은 경우 0%로 처리
             } else if (workOrder.getWorkOrderStatus() == WorkOrderStatus.COMPLETE) {
-                progress = 0.0; // Work order is complete, progress is 0%
+                progress = 0.0; // 작업지시 완료시 진행률 0%로 처리
             } else {
                 progress = (double) elapsedDuration / totalDuration * 100;
             }
 
-            // Update or add FacilityDto in the map
+            // map에 FacilityDto 업데이트 또는 추가
             if (!facilityDtoMap.containsKey(facilityName)) {
                 facilityDtoMap.put(facilityName, new FacilityDto(facilityName, facilityStatus, String.format("%.2f%%", progress)));
             } else {
-                // Update status and progress if necessary (e.g., for ongoing work orders)
+                // 필요한 경우 상태 및 진행 상황 업데이트(예: 진행 중인 작업 주문의 경우)
                 FacilityDto existingDto = facilityDtoMap.get(facilityName);
                 if (facilityStatus.equals("가동중")) {
                     existingDto.setFacilityStatus("가동중");
@@ -205,13 +205,13 @@ public class ReportController {
             }
         });
 
-        // Convert map values to list
+        // map을 list로 변환
         List<FacilityDto> facilityDtoList = new ArrayList<>(facilityDtoMap.values());
 
-        // Sort facilityDtoList by facility name (optional)
+        // 설비 이름별로 설비 DtoList 정렬
         facilityDtoList.sort(Comparator.comparing(FacilityDto::getFacilityName));
 
-        // Prepare DataTableResponse
+        // DataTableResponse 설정
         DataTableResponse<FacilityDto> response = new DataTableResponse<>();
         response.setDraw(draw);
         response.setRecordsTotal(facilityDtoList.size());
@@ -221,7 +221,7 @@ public class ReportController {
         return ResponseEntity.ok().body(response);
     }
 
-    //  설비 가동 상황 테이블 정보 제공 API
+    //  capa 현황 테이블 정보 제공 API
     @GetMapping(value = "/api/report/capa/progress")
     public ResponseEntity<DataTableResponse<CapaDto>> apiCapa(
             @RequestParam(defaultValue = "0") int draw,
@@ -230,7 +230,7 @@ public class ReportController {
 
         List<WorkOrder> workOrders = workOrderServiceHwang.getCapaWorkOrders();
 
-        // Filter work orders to include only the specified facility names
+        // 시설명 설정
         List<FacilityName> targetFacilities = Arrays.asList(
                 FacilityName.EXTRACTOR_1,
                 FacilityName.EXTRACTOR_2,
@@ -239,13 +239,15 @@ public class ReportController {
                 FacilityName.MIXER,
                 FacilityName.FILTER);
 
-        List<CapaDto> capaDtoList = workOrders.stream()
+        // map을 이용하여 시설별 capa 집계
+        Map<String, CapaDto> capaDtoMap = new HashMap<>();
+
+        workOrders.stream()
                 .filter(workOrder -> targetFacilities.contains(workOrder.getWorkOrderFacilityName()))
-                .sorted(Comparator.comparingLong(WorkOrder::getWorkOrderNo))
-                .map(workOrder -> {
+                .forEach(workOrder -> {
                     String capaName = workOrder.getWorkOrderFacilityName().getDescription();
 
-                    // Calculate capa progress as percentage of workOrderInput compared to max capacity
+                    // capa 진행률을 최대 용량 대비 workOrderInput의 백분율로 계산
                     double progress;
                     if (workOrder.getWorkOrderStatus() == WorkOrderStatus.WAITING) {
                         progress = 0.0;
@@ -268,18 +270,29 @@ public class ReportController {
                                 maxCapacity = 200.0;
                                 break;
                             default:
-                                maxCapacity = 0.0; // Handle other cases if necessary
+                                maxCapacity = 0.0; // 기본값 설정
                         }
                         progress = maxCapacity == 0 ? 0.0 : (double) workOrderInput / maxCapacity * 100;
                     } else {
-                        progress = 0.0; // Default progress for other cases
+                        progress = 0.0; // 기본값 설정
                     }
 
-                    return new CapaDto(capaName, String.format("%.2f%%", progress));
-                })
-                .distinct() // Ensure distinct CapaDto objects based on facility name
-                .collect(Collectors.toList());
+                    // map에서 CapaDto 업데이트 또는 추가
+                    if (!capaDtoMap.containsKey(capaName)) {
+                        capaDtoMap.put(capaName, new CapaDto(capaName, String.format("%.2f%%", progress)));
+                    } else {
+                        // 필요한 경우 진행 상황 업데이트(예: 진행 중인 작업 주문의 경우)
+                        CapaDto existingDto = capaDtoMap.get(capaName);
+                        if (progress > 0.0) {
+                            existingDto.setCapaProgress(String.format("%.2f%%", progress));
+                        }
+                    }
+                });
 
+        // map을 list로 변환
+        List<CapaDto> capaDtoList = new ArrayList<>(capaDtoMap.values());
+
+        // DataTableResponse 설정
         DataTableResponse<CapaDto> response = new DataTableResponse<>();
         response.setDraw(draw);
         response.setRecordsTotal(capaDtoList.size());
@@ -288,5 +301,6 @@ public class ReportController {
 
         return ResponseEntity.ok().body(response);
     }
+
 
 }
