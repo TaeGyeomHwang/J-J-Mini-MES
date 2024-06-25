@@ -229,6 +229,8 @@ public class WorkOrderServiceHwang {
                         orderRepositoryHwang.save(foundOrder);
                     }
                     /*  여기에 원자재 자동 출고 메소드 삽입*/
+//                    workOrder.getPlan().getPlanProductionAmount();
+//                    (Long orderNo, Long planAmount);
                 }
             }
             workOrder.setWorkOrderStatus(WorkOrderStatus.PROCESSING);
