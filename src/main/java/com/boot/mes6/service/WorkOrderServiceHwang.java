@@ -230,7 +230,7 @@ public class WorkOrderServiceHwang {
                     }
                     /*  여기에 원자재 자동 출고 메소드 삽입*/
 //                    workOrder.getPlan().getPlanProductionAmount();
-//                    (Long orderNo, Long planAmount);
+//                    (Long orderNo, Long planAmount, LocalDateTime workOrder.getWorkOrderStartDate());
                 }
             }
             workOrder.setWorkOrderStatus(WorkOrderStatus.PROCESSING);
