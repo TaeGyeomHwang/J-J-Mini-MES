@@ -24,6 +24,7 @@ import java.util.List;
 public class WorkOrderServiceHwang {
 
     private final CurrentProductServiceHwang currentProductServiceHwang;
+    private final MaterialService materialService;
 
     private final PlanRepositoryHwang planRepository;
     private final WorkOrderRepositoryHwang workOrderRepositoryHwang;
@@ -229,8 +230,7 @@ public class WorkOrderServiceHwang {
                         orderRepositoryHwang.save(foundOrder);
                     }
                     /*  여기에 원자재 자동 출고 메소드 삽입*/
-//                    workOrder.getPlan().getPlanProductionAmount();
-//                    (Long orderNo, Long planAmount, LocalDateTime workOrder.getWorkOrderStartDate());
+                    materialService.autoOutMaterial(orderNo, workOrder.getPlan().getPlanProductionAmount(), workOrder.getWorkOrderStartDate());
                 }
             }
             workOrder.setWorkOrderStatus(WorkOrderStatus.PROCESSING);
@@ -257,6 +257,7 @@ public class WorkOrderServiceHwang {
                         orderRepositoryHwang.save(foundOrder);
                     }
                     /*  여기에 원자재 자동 출고 메소드 삽입  */
+                    materialService.autoOutMaterial(orderNo, workOrder.getPlan().getPlanProductionAmount(), workOrder.getWorkOrderStartDate());
                 }
             }
             //  해당 작업지시가 포장 공정이라면

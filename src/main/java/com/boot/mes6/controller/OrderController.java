@@ -7,6 +7,7 @@ import com.boot.mes6.entity.Order;
 import com.boot.mes6.entity.OrderPlanMap;
 import com.boot.mes6.repository.OrderPlanMapRepositoryHwang;
 import com.boot.mes6.repository.OrderRepositoryHwang;
+import com.boot.mes6.service.MaterialService;
 import com.boot.mes6.service.OrderServiceHwang;
 import com.boot.mes6.service.PlanServiceHwang;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 public class OrderController {
     private final OrderServiceHwang orderServiceHwang;
     private final PlanServiceHwang planServiceHwang;
+    private final MaterialService materialService;
 
     private final OrderRepositoryHwang orderRepositoryHwang;
     private final OrderPlanMapRepositoryHwang orderPlanMapRepositoryHwang;
@@ -106,6 +108,9 @@ public class OrderController {
                         .orElseThrow(EntityNotFoundException::new);
                 Long updatedOrderNo = orderServiceHwang.updateOrderExpectDate(findOrder, planNo);
             }
+
+            //  수주 추가 후 원자재 자동 발주
+            materialService.autoAddMaterial(order);
 
         } catch (IllegalStateException e) {
             model.addAttribute("errorMessage", "수주 등록 중 에러가 발생하였습니다.");
