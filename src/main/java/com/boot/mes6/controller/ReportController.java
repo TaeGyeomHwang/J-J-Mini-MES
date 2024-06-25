@@ -32,6 +32,7 @@ public class ReportController {
     private final WorkOrderServiceHwang workOrderServiceHwang;
     private final CurrentTimeServiceHwang currentTimeServiceHwang;
 
+
     //  수주별 진행률 조회 페이지
     @GetMapping(value = "/report/order/progress")
     public String orderProgressMng(Model model) {
@@ -53,7 +54,7 @@ public class ReportController {
                         order.getOrderProductType().getDescription(),
                         order.getOrderAmount(),
                         order.getOrderCustomerName(),
-                        reportServiceHwang.calculateProgress(order.getOrderDate(),order.getOrderExpectShipDate())
+                        reportServiceHwang.calculateProgress(order.getOrderDate(), order.getOrderExpectShipDate())
                 ))
                 .collect(Collectors.toList());
 

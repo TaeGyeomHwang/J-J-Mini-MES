@@ -1,14 +1,12 @@
 package com.boot.mes6.service;
 
+import com.boot.mes6.constant.OrderType;
 import com.boot.mes6.constant.ProductName;
 import com.boot.mes6.entity.CurrentProduct;
-import com.boot.mes6.entity.CurrentTime;
 import com.boot.mes6.repository.CurrentProductRepositoryHwang;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -47,4 +45,5 @@ public class CurrentProductServiceHwang {
             saveInitProduct();
         }
     }
+
 }

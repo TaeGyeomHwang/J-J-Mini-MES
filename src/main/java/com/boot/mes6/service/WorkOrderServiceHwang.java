@@ -23,6 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkOrderServiceHwang {
 
+    private final CurrentProductServiceHwang currentProductServiceHwang;
+
     private final PlanRepositoryHwang planRepository;
     private final WorkOrderRepositoryHwang workOrderRepositoryHwang;
     private final OrderPlanMapRepositoryHwang orderPlanMapRepositoryHwang;

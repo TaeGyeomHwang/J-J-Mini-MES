@@ -11,10 +11,12 @@ class DatabaseInitializer implements ApplicationRunner {
 
     private final CurrentTimeServiceHwang currentTimeServiceHwang;
     private final CurrentProductServiceHwang currentProductServiceHwang;
+    private final ProductInOutServiceHwang productInOutServiceHwang;
 
     @Override
     public void run(ApplicationArguments args) {
         currentTimeServiceHwang.initializeCurrentTime();
         currentProductServiceHwang.initializeCurrentProduct();
+        productInOutServiceHwang.createDummyProductLog();
     }
 }
