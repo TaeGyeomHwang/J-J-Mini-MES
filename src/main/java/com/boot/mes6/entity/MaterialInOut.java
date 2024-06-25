@@ -4,7 +4,6 @@ import com.boot.mes6.constant.MaterialName;
 import com.boot.mes6.constant.MaterialStatus;
 import com.boot.mes6.constant.MaterialSupplierName;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 

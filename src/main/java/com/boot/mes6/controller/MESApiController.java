@@ -32,16 +32,18 @@ public class MESApiController {
     public ResponseEntity<Void> test() {
         LocalDateTime currentTime = timeService.getCurrentTime();
 
-        Order order = new Order();
-        order.setOrderNo(1L);
+        /*Order order = new Order();
+        order.setOrderNo(2L);
         order.setOrderType(OrderType.COMPANY);
         order.setOrderProductType(ProductName.CABBAGE_JUICE);
-        order.setOrderAmount(323L);
+        order.setOrderAmount(1000L);
         order.setOrderCustomerName("John Doe");
         order.setOrderDate(currentTime);
         order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
 
-        materialService.autoAddMaterial(order);
+        materialService.autoAddMaterial(order);*/
+
+        materialService.autoOutMaterial(3L, 200L, currentTime);
 
         return null;
     }

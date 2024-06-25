@@ -32,6 +32,11 @@ public class MesViewController {
         return "Material_in_out";
     }
 
+    @GetMapping("/materialAdd")
+    public String materialAdd() {
+        return "Material_Add";
+    }
+
     // 원자재 입출고 관리 테이블 정보
     @GetMapping("/materialinoutTable")
     public ResponseEntity<DataTableResponse<ResponseMaterial>> materialInOutTable(

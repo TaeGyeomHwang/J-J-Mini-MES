@@ -124,16 +124,10 @@
                 })
                     .then(response => {
                         console.log("good");
-                        console.log(response);
-                        fetch('/test2', {
-                            method:'POST',
-                            body: response,
-                        });
                     })
                     .catch(error => {
                         console.log(error);
                     })
-
             });
         });
     </script>

@@ -2,6 +2,8 @@ package com.boot.mes6.repository;
 
 import com.boot.mes6.constant.MaterialStatus;
 import com.boot.mes6.entity.MaterialInOut;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -28,4 +30,9 @@ public interface MaterialRepository extends JpaRepository<MaterialInOut, Long> {
     //원자재 발주 전인 애들 가져옴
     List<MaterialInOut> findByMaterialStatus(MaterialStatus materialStatus);
 
+
+    @Query(value = "SELECT * FROM material_in_out ORDER BY material_no DESC",
+            countQuery = "SELECT COUNT(*) FROM material_in_out",
+            nativeQuery = true)
+    Page<MaterialInOut> findAllOrderByMaterialNoDesc(Pageable pageable);
 }

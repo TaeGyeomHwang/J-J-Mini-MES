@@ -6,8 +6,9 @@ import com.boot.mes6.constant.MaterialSupplierName;
 import com.boot.mes6.constant.ProductName;
 import com.boot.mes6.entity.MaterialInOut;
 import com.boot.mes6.entity.Order;
-import com.boot.mes6.entity.Plan;
+import com.boot.mes6.repository.CurrentMaterialRepository;
 import com.boot.mes6.repository.MaterialRepository;
+import com.boot.mes6.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MaterialService {
     private final MaterialRepository materialRepository;
+    private final CurrentMaterialRepository currentMaterialRepository;
+    private final OrderRepository orderRepository;
+    private final CurrentMaterialService currentMaterialService;
 
     /* 지금 안 씀
     // 원자재 입출고 이력 가져오기
@@ -36,7 +40,7 @@ public class MaterialService {
 
     //원자재 입출고 이력 테이블 띄울 때 페이징으로 10개 단위로 DB에서 가져오기
     public Page<MaterialInOut> getMaterialInOutPage(Pageable pageable) {
-        return materialRepository.findAll(pageable);
+        return materialRepository.findAllOrderByMaterialNoDesc(pageable);
     }
 
     // 자동 원자재 발주
@@ -94,14 +98,17 @@ public class MaterialService {
         LocalDateTime materialReceiptDate = null; //기본값
 
         //orderDate가 금요일 오후, 토요일, 일요일이면 발주접수일을 월요일 12시로 설정
+        //평일 cutTime을 넘으면 다음날 발주
         if (materialOrderDate.getDayOfWeek() == DayOfWeek.FRIDAY && materialOrderDate.getHour() >= cutTime) {
             materialReceiptDate = materialOrderDate.plusDays(3).withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
         } else if(materialOrderDate.getDayOfWeek() == DayOfWeek.SATURDAY) {
             materialReceiptDate = materialOrderDate.plusDays(2).withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
         } else if(materialOrderDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
             materialReceiptDate = materialOrderDate.plusDays(1).withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
+        } else if(materialOrderDate.getHour() >= cutTime) {
+            materialReceiptDate = materialOrderDate.plusDays(1).withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
         } else {
-            //orderDate가 금요일 오후, 토요일, 일요일도 아니면 당일 12시로 설정
+            //orderDate가 금요일 오후, 토요일, 일요일도 아니고 오전이면 당일 12시로 설정
             materialReceiptDate = materialOrderDate.withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
         }
 
@@ -265,66 +272,154 @@ public class MaterialService {
     //원자재가 출고되면 원자재 입출고 이력에 레코드가 하나 추가되어야함
     //레코드를 추가하려면 MaterialInOut 객체를 만들어서 save를 해야하는데 필요한 정보는
     //수주ID, 제품명(양배추즙이면 양배추, 꿀이 필요하다는 것을 알 수 있음), 출고량, 업체명, 출고일, 상태(출고 완료), 이때 포장지랑 박스도 출고가 됨.
+
     //이 필요한 정보들을 생산계획 ID를 받아와서 그 id를 가지고 매핑 테이블의 수주ID를 가져옴
-    //수주ID로 수주 테이블의 정보를 가져와야함.
-    //원자재가 출고되는 시점은 생산계획의 생산 시작일 고로 지금 작성하는 메서드는 생산계획 쪽에서 실행이 되는 것임.
+    //수주ID로 수주 테이블의 정보를 가져와야함. -> 작업계획에서 줌.
+
+    //원자재가 출고되는 시점은 생산계획의 생산 시작일 고로 지금 작성하는 메서드는 작업계획 쪽에서 실행이 되는 것임.
     //자동으로 출고 될 때 포장지와 박스도 같이 출고가 되는데 각각 10만개, 1만개 이하가 될 시 원자재 자동 발주
     //그런데 이게 가능한가? 앗 가능하다 부족할 당시의 수주ID로 포장지와 박스를 주문 앙기모띠
     //리턴은 없음
-    public void autoOutMaterial(Plan plan) {
+    public void autoOutMaterial(Long orderNo, Long planAmount, LocalDateTime outDate) {
+        /*
+        //작업 계획에서 주는 것들
         //생산 계획을 가져와서 생산계획 id와 생산량을 가져온다.
         long planId = plan.getPlanNo();
         long planAmount = plan.getPlanProductionAmount();
-
         //생산 계획 id를 가지고 수주id를 가져온다.
-        long orderNo = orderPlanMapRepository.find();
+        orderNo = orderPlanMapRepository.find();
+         */
 
         //수주id로 수주 정보를 가져온다.
-        Order order = orderRepository.find();
+        Order order = orderRepository.findByOrderNo(orderNo);
 
         //어떤 제품을 생산할 계획인가
         switch (order.getOrderProductType()) {
             case CABBAGE_JUICE:
                 //양배추즙이라면 생산량에 따른 원자재량을 계산한다.
-
                 //주재료 계산 and save(출고)
-                //다른 정보 더 필요함
-                calculateAndSaveMaterial(ProductName.CABBAGE_JUICE, planAmount);
+                calculateAndSaveMaterial(MaterialName.CABBAGE, planAmount, order, MaterialSupplierName.A_FARM, outDate);
                 //부재료량 계산 and save(출고)
-                calculateAndSaveMaterial(MaterialType.SUB_MATERIAL, planAmount);
+                calculateAndSaveMaterial(MaterialName.HONEY, planAmount, order, MaterialSupplierName.A_FARM, outDate);
                 //포장지 계산 and save(출고)
-                calculateAndSaveMaterial(MaterialType.PACKAGE, planAmount);
+                calculateAndSaveMaterial(MaterialName.WRAPPER, planAmount, order, MaterialSupplierName.OO_WRAPPING_COMPANY, outDate);
                 //박스 계산 and save(출고)
-                calculateAndSaveMaterial(MaterialType.BOX, planAmount);
+                calculateAndSaveMaterial(MaterialName.BOX, planAmount, order, MaterialSupplierName.OO_WRAPPING_COMPANY, outDate);
                 break;
             case GARLIC_JUICE:
+                calculateAndSaveMaterial(MaterialName.GARLIC, planAmount, order, MaterialSupplierName.A_FARM, outDate);
+                calculateAndSaveMaterial(MaterialName.HONEY, planAmount, order, MaterialSupplierName.A_FARM, outDate);
+                calculateAndSaveMaterial(MaterialName.WRAPPER, planAmount, order, MaterialSupplierName.OO_WRAPPING_COMPANY, outDate);
+                calculateAndSaveMaterial(MaterialName.BOX, planAmount, order, MaterialSupplierName.OO_WRAPPING_COMPANY, outDate);
+                break;
             case POMEGRANATE_JELLY:
+                calculateAndSaveMaterial(MaterialName.POMEGRANATE, planAmount, order, MaterialSupplierName.OO_NH, outDate);
+                calculateAndSaveMaterial(MaterialName.COLLAGEN, planAmount, order, MaterialSupplierName.OO_NH, outDate);
+                calculateAndSaveMaterial(MaterialName.WRAPPER, planAmount, order, MaterialSupplierName.OO_WRAPPING_COMPANY, outDate);
+                calculateAndSaveMaterial(MaterialName.BOX, planAmount, order, MaterialSupplierName.OO_WRAPPING_COMPANY, outDate);
+                break;
             case PLUM_JELLY:
+                calculateAndSaveMaterial(MaterialName.PLUM, planAmount, order, MaterialSupplierName.OO_NH, outDate);
+                calculateAndSaveMaterial(MaterialName.COLLAGEN, planAmount, order, MaterialSupplierName.OO_NH, outDate);
+                calculateAndSaveMaterial(MaterialName.WRAPPER, planAmount, order, MaterialSupplierName.OO_WRAPPING_COMPANY, outDate);
+                calculateAndSaveMaterial(MaterialName.BOX, planAmount, order, MaterialSupplierName.OO_WRAPPING_COMPANY, outDate);
+                break;
             default:
                 throw new IllegalArgumentException("Invalid product type: " + order.getOrderProductType());
+        }
+
+        //포장지, 박스 자동 발주
+        //위에서 원자재 자동 출고 후 포장지 or 박스 부족하면 자동 발주
+        //먼저 출고 후 포장지 or 박스가 부족한지 체크
+        //원자재 입출고는 수주id가 fk이기 때문에 order 넣어줌
+        Long wrapperAmount = currentMaterialRepository.findByCurrentMaterialName(MaterialName.WRAPPER).get().getCurrentMaterialAmount();
+        if(wrapperAmount < 100000L) {
+            autoOrderWrapperAndBox(order, MaterialName.WRAPPER, outDate);
+        }
+
+        Long boxAmount = currentMaterialRepository.findByCurrentMaterialName(MaterialName.BOX).get().getCurrentMaterialAmount();
+        if(boxAmount < 10000L) {
+            autoOrderWrapperAndBox(order, MaterialName.BOX, outDate);
         }
     }
 
     //원자재량을 계산하고 save(출고)까지 하는 메서드
-    private void calculateAndSaveMaterial(MaterialType materialType, long planAmount) {
-        MaterialInOut materialInOut = createMaterialOutOrder(materialType, planAmount);
+    private void calculateAndSaveMaterial(MaterialName materialName, Long planAmount, Order order, MaterialSupplierName materialSupplierName, LocalDateTime outDate) {
+        MaterialInOut materialInOut = createMaterialOutOrder(materialName, planAmount, order, materialSupplierName, outDate);
         materialRepository.save(materialInOut);
+        currentMaterialService.minusCurrentMaterial(materialName, materialInOut.getMaterialInoutAmount());
     }
 
     //출고를 위한 MaterialInOut 객체 만들어주는 메서드
-    private MaterialInOut createMaterialOutOrder(MaterialType materialType, long planAmount) {
+    private MaterialInOut createMaterialOutOrder(MaterialName materialName, Long planAmount, Order order, MaterialSupplierName materialSupplierName, LocalDateTime outDate) {
         MaterialInOut materialInOut = new MaterialInOut();
-        materialInOut.setOrder(order);
-        materialInOut.setMaterialName(materialType.getMaterialName());
-        materialInOut.setMaterialInoutAmount(calculateMaterialAmount(materialType, planAmount));
-        // Set other properties like supplier, dates, status, etc.
+        materialInOut.setOrder(order); //수주 ID
+        materialInOut.setMaterialName(materialName); // 원자재명
+        materialInOut.setMaterialInoutAmount(calculateMaterialAmount(materialName, planAmount, order.getOrderProductType())); //원자재량
+        materialInOut.setMaterialSupplierName(materialSupplierName); //업체명
+        materialInOut.setMaterialOutDate(outDate); //출고일
+        materialInOut.setMaterialStatus(MaterialStatus.OUT); //상태
         return materialInOut;
     }
 
     //생산량에 따른 원자재량 계산하는 메서드
-    private Long calculateMaterialAmount(MaterialType materialType, long planAmount) {
-        // Calculate amount based on material type and plan amount
-        // Implement logic according to your business rules
-        return ...; // Calculation logic here
+    private Long calculateMaterialAmount(MaterialName materialName, Long planAmount, ProductName productName) {
+        switch(materialName) {
+            case CABBAGE:
+            case GARLIC:
+                return (long) Math.ceil(planAmount * 30 * 10 / 0.5 / 0.2 / 0.75 / 1000);
+            case HONEY:
+                return (long) Math.ceil(planAmount * 30 * 5 / 1000.0);
+            case POMEGRANATE:
+            case PLUM:
+                return (long) Math.ceil(planAmount * 25 * 5 / 1000.0);
+            case COLLAGEN:
+                return (long) Math.ceil(planAmount * 25 * 2 / 1000.0);
+            case BOX:
+                return planAmount;
+            case WRAPPER:
+                //포장지(wrapper)는 CABBAGE, GARLIC 때는 30개 필요, POMEGRANATE, PLUM일 때는 25개 필요
+                switch (productName) {
+                    case CABBAGE_JUICE:
+                    case GARLIC_JUICE:
+                        return planAmount * 30;
+                    case POMEGRANATE_JELLY:
+                    case PLUM_JELLY:
+                        return planAmount * 25;
+                    default:
+                        throw new IllegalArgumentException("Invalid product type for wrapper: " + productName);
+                }
+            default:
+                throw new IllegalArgumentException("Invalid product type: " + materialName);
+        }
+    }
+
+    //포장지, 박스 부족 시 자동 발주
+    public void autoOrderWrapperAndBox(Order order, MaterialName materialName, LocalDateTime receiptDate) {
+        MaterialInOut materialInOut = new MaterialInOut();
+        materialInOut.setOrder(order); //수주 번호
+        materialInOut.setMaterialName(materialName); //포장지 or 박스
+
+        if(MaterialName.WRAPPER.equals(materialName)) {
+            materialInOut.setMaterialInoutAmount(100000L); //포장지
+        } else {
+            materialInOut.setMaterialInoutAmount(10000L); //박스
+        }
+
+        materialInOut.setMaterialSupplierName(MaterialSupplierName.OO_WRAPPING_COMPANY); //업체명
+        materialInOut.setMaterialOrderDate(receiptDate); //발주일(원자재 나가는 시간)
+
+        //발주 접수일, 주말이면 월요일로
+        if(order.getOrderDate().getDayOfWeek() == DayOfWeek.SUNDAY) {
+            materialInOut.setMaterialReceiptDate(receiptDate.plusDays(1));
+        } else if(order.getOrderDate().getDayOfWeek() == DayOfWeek.SATURDAY) {
+            materialInOut.setMaterialReceiptDate(receiptDate.plusDays(2));
+        } else {
+            materialInOut.setMaterialReceiptDate(receiptDate);
+        }
+
+        materialInOut.setMaterialStatus(MaterialStatus.PREPARING_SHIP); //상태
+
+        materialRepository.save(materialInOut);
     }
 }
