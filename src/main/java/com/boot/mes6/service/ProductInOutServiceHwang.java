@@ -44,6 +44,7 @@ public class ProductInOutServiceHwang {
         productInOutRepositoryHwang.save(productInOut4);
     }
 
+    //  해당 날짜 사이의 완제품 입출고 이력을 찾아 리스트로 리턴하는 메소드
     public List<ProductInOut> getProductInOutByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return productInOutRepositoryHwang.findByProductInDateBetween(startDate, endDate);
     }
