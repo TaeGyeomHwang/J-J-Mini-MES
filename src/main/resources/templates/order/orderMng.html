@@ -44,7 +44,15 @@
         }
 
         .dataTables_info {
+        }
 
+        .btn-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-right {
+            margin-left: auto;
         }
     </style>
 </th:block>
@@ -52,7 +60,10 @@
 <div layout:fragment="content" class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
         <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">수주 목록</h1>
-        <a href="/order/new" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">수주 추가</a>
+        <div class="btn-container btn-right">
+            <a href="/order/new" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">수주 추가</a>
+            <a href="/order/excel/new" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">엑셀로 추가</a>
+        </div>
     </div>
     <table id="myTable" class="display">
         <thead>

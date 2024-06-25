@@ -1,5 +1,7 @@
 package com.boot.mes6.controller;
 
+import com.boot.mes6.constant.OrderType;
+import com.boot.mes6.constant.ProductName;
 import com.boot.mes6.dto.DataTableResponse;
 import com.boot.mes6.dto.OrderDto;
 import com.boot.mes6.dto.OrderFormDto;
@@ -19,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.awt.print.Book;
@@ -113,5 +116,31 @@ public class OrderController {
         }
 
         return "redirect:/orders";
+    }
+
+    //  수주 엑셀로 추가 페이지
+    @GetMapping(value = "/order/excel/new")
+    public String orderExcelAdd(Model model) {
+        return "order/orderExcelAdd";
+    }
+
+    //  유효성 검사한 엑셀파일 수주로 추가
+    @PostMapping("/order/excel/upload")
+    public ResponseEntity<?> uploadExcelData(@RequestBody List<List<String>> excelData) {
+        try {
+            for (List<String> row : excelData) {
+                OrderFormDto orderFormDto = new OrderFormDto();
+                orderFormDto.setOrderType(OrderType.valueOf(row.get(0)));
+                orderFormDto.setProductName(ProductName.valueOf(row.get(1)));
+                orderFormDto.setOrderAmount((long) Integer.parseInt(row.get(2)));
+                orderFormDto.setOrderCustomerName(row.get(3));
+                orderFormDto.setOrderIsEmergency(Boolean.parseBoolean(row.get(4)));
+
+                orderServiceHwang.saveOrderManual(orderFormDto);
+            }
+            return ResponseEntity.ok().body("Orders successfully added.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while processing the Excel file.");
+        }
     }
 }
