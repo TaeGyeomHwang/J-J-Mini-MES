@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일일/월간 생산량</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<div layout:fragment="content" class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
+        <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">일일 생산량</h1>
+    </div>
+
+    <div>
+        <label for="date">날짜 선택:</label>
+        <input type="date" id="date">
+        <button id="loadDailyDataButton">조회</button>
+    </div>
+
+    <canvas id="dailyProductInOutChart" width="400" height="200"></canvas>
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
+        <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">월간 생산량</h1>
+    </div>
+
+    <div class="mt-4">
+        <label for="monthlyDate">날짜 선택:</label>
+        <input type="month" id="monthlyDate">
+        <button id="loadMonthlyDataButton">조회</button>
+    </div>
+
+    <canvas id="monthlyProductInOutChart" width="400" height="200"></canvas>
+</div>
+
+<th:block layout:fragment="script">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let dailyChart = null;
+            let monthlyChart = null;
+
+            const dailyCtx = document.getElementById('dailyProductInOutChart').getContext('2d');
+            const monthlyCtx = document.getElementById('monthlyProductInOutChart').getContext('2d');
+
+            function loadInitialCharts() {
+                fetch('/api/currentTime/graph')
+                    .then(response => response.json())
+                    .then(data => {
+                        const currentDate = data.currentDate;
+                        const currentYearMonth = data.currentYearMonth;
+
+                        // Set the date and month inputs
+                        document.getElementById('date').value = currentDate;
+                        document.getElementById('monthlyDate').value = currentYearMonth;
+
+                        // Load the charts
+                        loadDailyChart(currentDate);
+                        loadMonthlyChart(currentYearMonth);
+                    })
+                    .catch(error => console.error('Error fetching current time:', error));
+            }
+
+            function loadDailyChart(date) {
+                const fetchUrl = `/api/productGraph?date=${date}`;
+
+                // Destroy existing daily chart if it exists
+                if (dailyChart) {
+                    dailyChart.destroy();
+                }
+
+                fetchChartData(fetchUrl, dailyCtx, '일일 생산량')
+                    .then(chart => {
+                        dailyChart = chart;
+                    });
+            }
+
+            function loadMonthlyChart(yearMonth) {
+                const fetchUrl = `/api/monthlyProductGraph?yearMonth=${yearMonth}`;
+
+                // Destroy existing monthly chart if it exists
+                if (monthlyChart) {
+                    monthlyChart.destroy();
+                }
+
+                fetchChartData(fetchUrl, monthlyCtx, '월간 생산량')
+                    .then(chart => {
+                        monthlyChart = chart;
+                    });
+            }
+
+            function fetchChartData(fetchUrl, ctx, chartLabel) {
+                return fetch(fetchUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const expectedProducts = ['CABBAGE_JUICE', 'GARLIC_JUICE', 'POMEGRANATE_JELLY', 'PLUM_JELLY'];
+                        const chartData = {
+                            'CABBAGE_JUICE': 0,
+                            'GARLIC_JUICE': 0,
+                            'POMEGRANATE_JELLY': 0,
+                            'PLUM_JELLY': 0
+                        };
+
+                        data.forEach(item => {
+                            if (item.productName in chartData) {
+                                chartData[item.productName] += item.productInoutAmount;
+                            }
+                        });
+
+                        const labels = expectedProducts;
+                        const values = labels.map(product => chartData[product]);
+
+                        return new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['양배추즙','흑마늘즙','석류 젤리스틱','매실 젤리스틱'],
+                                datasets: [{
+                                    label: chartLabel,
+                                    data: values,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+
+            // Load the initial charts
+            loadInitialCharts();
+
+            // Add event listeners for the buttons
+            document.getElementById('loadDailyDataButton').addEventListener('click', function () {
+                const date = document.getElementById('date').value;
+                loadDailyChart(date);
+            });
+
+            document.getElementById('loadMonthlyDataButton').addEventListener('click', function () {
+                const yearMonth = document.getElementById('monthlyDate').value;
+                loadMonthlyChart(yearMonth);
+            });
+        });
+    </script>
+</th:block>
+
+</html>

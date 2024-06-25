@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수주별 진행률</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+</head>
+
+<th:block layout:fragment="css">
+    <style>
+        .container-fluid {
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #myTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #myTable th, #myTable td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+
+        #myTable th {
+            background-color: #f2f2f2;
+        }
+
+        .btn {
+            margin-bottom: 10px;
+        }
+
+        .dataTables_filter {
+            display: none;
+        }
+
+        .dataTables_info {
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content" class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
+        <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">수주별 진행률</h1>
+    </div>
+    <table id="myTable" class="display">
+        <thead>
+        <tr>
+            <th>수주번호</th>
+            <th>제품명</th>
+            <th>주문량</th>
+            <th>업체명/고객명</th>
+            <th>진행률</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<th:block layout:fragment="script">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "/api/report/order/progress",
+                    "type": "GET",
+                    "data": function (params) {
+                        return {
+                            draw: params.draw,
+                            start: params.start,
+                            length: params.length
+                        };
+                    },
+                    "dataSrc": "data"
+                },
+                "columns": [
+                    { "data": "orderNo" },
+                    { "data": "orderProductType" },
+                    {
+                        "data": "orderAmount",
+                        "render": function (data, type, row) {
+                            return data + " Box";
+                        }
+                    },
+                    { "data": "orderCustomerName" },
+                    { "data": "orderProgress" }
+                ],
+                "paging": true,
+                "lengthMenu": [ 10, 25, 50, 100 ],
+                "pageLength": 10,
+                "language": {
+                    "lengthMenu": "_MENU_ 개 단위",
+                    "info": "전체 _TOTAL_개, _START_부터 _END_까지",
+                    "paginate": {
+                        "previous": "이전",
+                        "next": "이후"
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    if (data.orderProgress === "100.00%") {
+                        $(row).css('background-color', '#B1CFCF');
+                    }
+                }
+            });
+        });
+    </script>
+</th:block>
+</html>
