@@ -28,7 +28,8 @@ public class CurrentTimeServiceHwang {
     }
 
     public LocalDateTime getCurrentTime() {
-        return currentTimeRepositoryHwang.findById(1L)
-                .orElseThrow(EntityNotFoundException::new).getCurrentTimeValue();
+        CurrentTime currentTime = currentTimeRepositoryHwang.findById(1L)
+                .orElseThrow(EntityNotFoundException::new);
+        return currentTime.getCurrentTimeValue();
     }
 }
