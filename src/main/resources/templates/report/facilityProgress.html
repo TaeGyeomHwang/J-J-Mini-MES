@@ -20,18 +20,18 @@
             margin-bottom: 20px;
         }
 
-        #myTable {
+        #myTable, #myTable2 {
             width: 100%;
             border-collapse: collapse;
         }
 
-        #myTable th, #myTable td {
+        #myTable th, #myTable td, #myTable2 th, #myTable2 td {
             border: 1px solid black;
             padding: 8px;
             text-align: center;
         }
 
-        #myTable th {
+        #myTable th, #myTable2 th {
             background-color: #f2f2f2;
         }
 
@@ -121,6 +121,11 @@
                     { "data": "facilityStatus" },
                     { "data": "facilityProgress" },
                 ],
+                "createdRow": function (row, data, dataIndex) {
+                    if (data.facilityStatus === "가동중") {
+                        $(row).css('background-color', '#B1CFCF');
+                    }
+                },
                 "paging": true,
                 "lengthMenu": [ 15, 25, 50, 100 ],
                 "pageLength": 15,
@@ -153,6 +158,11 @@
                     { "data": "capaName" },
                     { "data": "capaProgress" },
                 ],
+                "createdRow": function (row, data, dataIndex) {
+                    if (data.capaProgress === "100.00%") {
+                        $(row).css('background-color', '#B1CFCF');
+                    }
+                },
                 "paging": true,
                 "lengthMenu": [ 15, 25, 50, 100 ],
                 "pageLength": 15,
