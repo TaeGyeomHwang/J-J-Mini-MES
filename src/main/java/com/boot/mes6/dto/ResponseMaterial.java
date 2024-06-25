@@ -15,15 +15,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
+//원자재 입출고 이력 데이터 DTO
 public class ResponseMaterial {
     private Long materialNo;
-    private MaterialName materialName;
+    private String materialName;
     private Long materialInoutAmount;
-    private MaterialSupplierName materialSupplierName;
+    private String materialSupplierName;
     private LocalDateTime materialOrderDate;
     private LocalDateTime materialReceiptDate;
     private LocalDateTime materialInDate;
     private LocalDateTime materialOutDate;
     private LocalDate materialExpireDate;
-    private MaterialStatus materialStatus;
+    private String materialStatus;
 }

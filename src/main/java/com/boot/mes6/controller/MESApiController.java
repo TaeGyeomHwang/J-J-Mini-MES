@@ -12,6 +12,7 @@ import com.boot.mes6.service.MaterialService;
 import com.boot.mes6.service.TimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,9 +27,32 @@ public class MESApiController {
     private final MaterialService materialService;
     private final MaterialRepository materialRepository;
 
-    //수동 원자재 발주 추가
-    //아직 미완성
-    @PostMapping("/AddMaterial")
+    //원자재가 자동 발주되는지 테스트
+    @PostMapping("/test")
+    public ResponseEntity<Void> test() {
+        LocalDateTime currentTime = timeService.getCurrentTime();
+
+        Order order = new Order();
+        order.setOrderNo(1L);
+        order.setOrderType(OrderType.COMPANY);
+        order.setOrderProductType(ProductName.CABBAGE_JUICE);
+        order.setOrderAmount(323L);
+        order.setOrderCustomerName("John Doe");
+        order.setOrderDate(currentTime);
+        order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
+
+        materialService.autoAddMaterial(order);
+
+        return null;
+    }
+}
+
+
+
+
+//수동 원자재 발주 추가
+//아직 미완성
+    /*@PostMapping("/AddMaterial")
     public ResponseEntity<AddMaterial> ManualAddMaterial(@RequestBody AddMaterial addMaterial) {
         //System.out.println("good");
         LocalDateTime currentTime = timeService.getCurrentTime();
@@ -52,24 +76,4 @@ public class MESApiController {
         materialService.addMaterial(materialInOut);
 
         return ResponseEntity.ok().body(addMaterial);
-    }
-
-    //원자재가 자동 발주되는지 테스트
-    @PostMapping("/test")
-    public ResponseEntity<Void> test() {
-        LocalDateTime currentTime = timeService.getCurrentTime();
-
-        Order order = new Order();
-        order.setOrderNo(4L);
-        order.setOrderType(OrderType.COMPANY);
-        order.setOrderProductType(ProductName.CABBAGE_JUICE);
-        order.setOrderAmount(1000L);
-        order.setOrderCustomerName("John Doe");
-        order.setOrderDate(currentTime);
-        order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
-
-        materialService.autoAddMaterial(order);
-
-        return null;
-    }
-}
+    }*/

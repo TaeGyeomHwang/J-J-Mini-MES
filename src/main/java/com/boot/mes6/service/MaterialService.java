@@ -6,9 +6,12 @@ import com.boot.mes6.constant.MaterialSupplierName;
 import com.boot.mes6.constant.ProductName;
 import com.boot.mes6.entity.MaterialInOut;
 import com.boot.mes6.entity.Order;
+import com.boot.mes6.entity.Plan;
 import com.boot.mes6.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -19,6 +22,7 @@ import java.util.List;
 public class MaterialService {
     private final MaterialRepository materialRepository;
 
+    /* 지금 안 씀
     // 원자재 입출고 이력 가져오기
     public List<MaterialInOut> getAllMaterial() {
         return materialRepository.findAll();
@@ -27,6 +31,12 @@ public class MaterialService {
     // 원자재 입출고 이력에 추가하기
     public void addMaterial(MaterialInOut materialInOut) {
         materialRepository.save(materialInOut);
+    }
+    */
+
+    //원자재 입출고 이력 테이블 띄울 때 페이징으로 10개 단위로 DB에서 가져오기
+    public Page<MaterialInOut> getMaterialInOutPage(Pageable pageable) {
+        return materialRepository.findAll(pageable);
     }
 
     // 자동 원자재 발주
@@ -77,6 +87,8 @@ public class MaterialService {
         }
     }
 
+    //밑의 주석은 양배추즙 기준
+    //발주 접수일을 정하고 발주하는 메서드
     public void calculateReceiptDate(Order order, Long materialAmount, int cutTime, long MAX_ORDER_AMOUNT, MaterialName materialName, LocalDateTime materialOrderDate, MaterialSupplierName supplierName) {
         //수주 정보에서 수주일(발주일)에 따라 기본 발주접수일(materialReceiptDate) 설정
         LocalDateTime materialReceiptDate = null; //기본값
@@ -137,6 +149,8 @@ public class MaterialService {
         //가져온 list가 안 비었다면
         else {
             //테이블에서 해당 원자재의 마지막 발주 접수일을 가져옴
+            //그래야 발주 접수일 날짜가 바뀌었을 때 그것을 기준으로 다음날 주문 가능
+            //결론은 발주 접수일을 맞추기 위해서
             materialReceiptDate = materialRepository.findLatestMaterialInOut(materialName.toString());
 
             //일단 가져온 list의 발주량의 합을 구한다.
@@ -232,9 +246,9 @@ public class MaterialService {
             default:
                 throw new IllegalArgumentException("Invalid product type");
         }
-
     }
 
+    //입고를 위한 MaterialInOut 객체 만들어주는 메서드
     private MaterialInOut createMaterialOrder(Order order, MaterialName materialName, Long materialAmount, MaterialSupplierName materialSupplierName, LocalDateTime materialOrderDate, LocalDateTime materialReceiptDate) {
         MaterialInOut materialInOut = new MaterialInOut();
         materialInOut.setOrder(order);
@@ -247,4 +261,70 @@ public class MaterialService {
         return materialInOut;
     }
 
+    //원자재 자동 출고 기능
+    //원자재가 출고되면 원자재 입출고 이력에 레코드가 하나 추가되어야함
+    //레코드를 추가하려면 MaterialInOut 객체를 만들어서 save를 해야하는데 필요한 정보는
+    //수주ID, 제품명(양배추즙이면 양배추, 꿀이 필요하다는 것을 알 수 있음), 출고량, 업체명, 출고일, 상태(출고 완료), 이때 포장지랑 박스도 출고가 됨.
+    //이 필요한 정보들을 생산계획 ID를 받아와서 그 id를 가지고 매핑 테이블의 수주ID를 가져옴
+    //수주ID로 수주 테이블의 정보를 가져와야함.
+    //원자재가 출고되는 시점은 생산계획의 생산 시작일 고로 지금 작성하는 메서드는 생산계획 쪽에서 실행이 되는 것임.
+    //자동으로 출고 될 때 포장지와 박스도 같이 출고가 되는데 각각 10만개, 1만개 이하가 될 시 원자재 자동 발주
+    //그런데 이게 가능한가? 앗 가능하다 부족할 당시의 수주ID로 포장지와 박스를 주문 앙기모띠
+    //리턴은 없음
+    public void autoOutMaterial(Plan plan) {
+        //생산 계획을 가져와서 생산계획 id와 생산량을 가져온다.
+        long planId = plan.getPlanNo();
+        long planAmount = plan.getPlanProductionAmount();
+
+        //생산 계획 id를 가지고 수주id를 가져온다.
+        long orderNo = orderPlanMapRepository.find();
+
+        //수주id로 수주 정보를 가져온다.
+        Order order = orderRepository.find();
+
+        //어떤 제품을 생산할 계획인가
+        switch (order.getOrderProductType()) {
+            case CABBAGE_JUICE:
+                //양배추즙이라면 생산량에 따른 원자재량을 계산한다.
+
+                //주재료 계산 and save(출고)
+                //다른 정보 더 필요함
+                calculateAndSaveMaterial(ProductName.CABBAGE_JUICE, planAmount);
+                //부재료량 계산 and save(출고)
+                calculateAndSaveMaterial(MaterialType.SUB_MATERIAL, planAmount);
+                //포장지 계산 and save(출고)
+                calculateAndSaveMaterial(MaterialType.PACKAGE, planAmount);
+                //박스 계산 and save(출고)
+                calculateAndSaveMaterial(MaterialType.BOX, planAmount);
+                break;
+            case GARLIC_JUICE:
+            case POMEGRANATE_JELLY:
+            case PLUM_JELLY:
+            default:
+                throw new IllegalArgumentException("Invalid product type: " + order.getOrderProductType());
+        }
+    }
+
+    //원자재량을 계산하고 save(출고)까지 하는 메서드
+    private void calculateAndSaveMaterial(MaterialType materialType, long planAmount) {
+        MaterialInOut materialInOut = createMaterialOutOrder(materialType, planAmount);
+        materialRepository.save(materialInOut);
+    }
+
+    //출고를 위한 MaterialInOut 객체 만들어주는 메서드
+    private MaterialInOut createMaterialOutOrder(MaterialType materialType, long planAmount) {
+        MaterialInOut materialInOut = new MaterialInOut();
+        materialInOut.setOrder(order);
+        materialInOut.setMaterialName(materialType.getMaterialName());
+        materialInOut.setMaterialInoutAmount(calculateMaterialAmount(materialType, planAmount));
+        // Set other properties like supplier, dates, status, etc.
+        return materialInOut;
+    }
+
+    //생산량에 따른 원자재량 계산하는 메서드
+    private Long calculateMaterialAmount(MaterialType materialType, long planAmount) {
+        // Calculate amount based on material type and plan amount
+        // Implement logic according to your business rules
+        return ...; // Calculation logic here
+    }
 }
