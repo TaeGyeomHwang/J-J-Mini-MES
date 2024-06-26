@@ -32,13 +32,13 @@ public class CurrentMaterialService {
             Long currentAmount = currentMaterial.getCurrentMaterialAmount();
             currentMaterial.setCurrentMaterialAmount(currentAmount + amount);
             currentMaterialRepository.save(currentMaterial);
-        } else {
+        } /*else {
             // 재고에 없는 경우, 새로 추가
             CurrentMaterial newCurrentMaterial = new CurrentMaterial();
             newCurrentMaterial.setCurrentMaterialName(materialName);
             newCurrentMaterial.setCurrentMaterialAmount(amount);
             currentMaterialRepository.save(newCurrentMaterial);
-        }
+        }*/
     }
 
     //원자재가 출고되었을 때 원자재 재고 현황에 빼기

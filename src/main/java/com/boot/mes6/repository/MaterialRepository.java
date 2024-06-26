@@ -30,7 +30,8 @@ public interface MaterialRepository extends JpaRepository<MaterialInOut, Long> {
     //원자재 발주 전인 애들 가져옴
     List<MaterialInOut> findByMaterialStatus(MaterialStatus materialStatus);
 
-
+    //원자재 입출고 이력 테이블 띄울 때 페이징으로 10개 단위로 DB에서 가져오기, material_no 기준 내림차순으로
+    //jpql에서 desc가 안먹어서 그냥 네이티브로 해결
     @Query(value = "SELECT * FROM material_in_out ORDER BY material_no DESC",
             countQuery = "SELECT COUNT(*) FROM material_in_out",
             nativeQuery = true)

@@ -18,5 +18,6 @@ class DatabaseInitializer implements ApplicationRunner {
         currentTimeServiceHwang.initializeCurrentTime();
         currentProductServiceHwang.initializeCurrentProduct();
         currentMaterialService.initializeCurrentMaterial();
+
     }
 }
