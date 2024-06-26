@@ -36,6 +36,7 @@
                     data: { minutes: minutes },
                     success: function() {
                         getCurrentTime(); // 시간 업데이트 후 다시 화면에 표시
+                        location.reload();
                     },
                     error: function(error) {
                         console.log('Error updating time:', error);
