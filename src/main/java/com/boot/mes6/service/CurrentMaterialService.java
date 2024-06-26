@@ -56,6 +56,9 @@ public class CurrentMaterialService {
                 currentMaterial.setCurrentMaterialAmount(currentAmount - outAmount);
                 currentMaterialRepository.save(currentMaterial);
             } else {
+                System.out.println("currentAmount: "+currentAmount);
+                System.out.println("currentAmount: "+currentAmount);
+                System.out.println("outAmount: "+outAmount);
                 // 재고가 충분하지 않은 경우, 예외 발생
                 throw new IllegalArgumentException("Insufficient stock for material: " + materialName);
             }

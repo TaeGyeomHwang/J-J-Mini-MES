@@ -25,6 +25,7 @@ public class WorkOrderServiceHwang {
 
     private final CurrentProductServiceHwang currentProductServiceHwang;
     private final MaterialService materialService;
+    private final ProductInOutServiceHwang productInOutServiceHwang;
 
     private final PlanRepositoryHwang planRepository;
     private final WorkOrderRepositoryHwang workOrderRepositoryHwang;
@@ -229,9 +230,9 @@ public class WorkOrderServiceHwang {
                         foundOrder.setOrderStatus(OrderStatus.IN_PRODUCTION);
                         orderRepositoryHwang.save(foundOrder);
                     }
-                    /*  여기에 원자재 자동 출고 메소드 삽입*/
-                    materialService.autoOutMaterial(orderNo, workOrder.getPlan().getPlanProductionAmount(), workOrder.getWorkOrderStartDate());
                 }
+                /*  여기에 원자재 자동 출고 메소드 삽입*/
+                materialService.autoOutMaterial(orderPlanMapList.get(0).getOrder().getOrderNo(), workOrder.getPlan().getPlanProductionAmount(), workOrder.getWorkOrderStartDate());
             }
             workOrder.setWorkOrderStatus(WorkOrderStatus.PROCESSING);
             workOrderRepositoryHwang.save(workOrder);
@@ -244,6 +245,7 @@ public class WorkOrderServiceHwang {
     public List<Long> setWorkOrderStatusComplete() {
         List<Long> workOrderNoList = new ArrayList<>();
         List<WorkOrder> workOrderWaiting = workOrderRepositoryHwang.findProcessingOrWaitingWorkOrdersWithCurrentTimeAfterExpectDate();
+
         for (WorkOrder workOrder : workOrderWaiting) {
             //  해당 작업지시가 전처리 또는 혼합 공정이라면
             if (workOrder.getWorkOrderProcessName() == ProcessCode.A1 | workOrder.getWorkOrderProcessName() == ProcessCode.B1) {
@@ -256,9 +258,9 @@ public class WorkOrderServiceHwang {
                         foundOrder.setOrderStatus(OrderStatus.IN_PRODUCTION);
                         orderRepositoryHwang.save(foundOrder);
                     }
-                    /*  여기에 원자재 자동 출고 메소드 삽입  */
-                    materialService.autoOutMaterial(orderNo, workOrder.getPlan().getPlanProductionAmount(), workOrder.getWorkOrderStartDate());
                 }
+                /*  여기에 원자재 자동 출고 메소드 삽입  */
+                materialService.autoOutMaterial(orderPlanMapList.get(0).getOrder().getOrderNo(), workOrder.getPlan().getPlanProductionAmount(), workOrder.getWorkOrderStartDate());
             }
             //  해당 작업지시가 포장 공정이라면
             if (workOrder.getWorkOrderProcessName() == ProcessCode.A7 | workOrder.getWorkOrderProcessName() == ProcessCode.B6) {
@@ -272,10 +274,12 @@ public class WorkOrderServiceHwang {
                             foundOrder.setOrderOutDate(foundOrder.getOrderExpectShipDate());
                             orderRepositoryHwang.save(foundOrder);
                             /*  여기에 완제품 입고 및 출고 메소드 삽입  */
-//                            (Order order, Long workOrder.getWorkOrderOutput(), LocalDateTime workOrder.setWorkOrderFinishDate(), ProductName foundOrder.getOrderProductType());
-//                            (Order order, Long workOrder.getWorkOrderOutput(), LocalDateTime workOrder.setWorkOrderFinishDate(), ProductName foundOrder.getOrderProductType());
+                            productInOutServiceHwang.productIn(foundOrder, workOrder.getWorkOrderOutput(), workOrder.getWorkOrderFinishDate());
+                            productInOutServiceHwang.productOut(foundOrder, workOrder.getWorkOrderOutput(), workOrder.getWorkOrderFinishDate());
                         } else {
                             /*  여기에 완제품 입고 메소드 삽입   */
+                            productInOutServiceHwang.productIn(foundOrder, workOrder.getWorkOrderOutput(), workOrder.getWorkOrderFinishDate());
+
                         }
                     }
                 }
