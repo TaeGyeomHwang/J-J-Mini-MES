@@ -272,8 +272,8 @@ public class WorkOrderServiceHwang {
                             foundOrder.setOrderOutDate(foundOrder.getOrderExpectShipDate());
                             orderRepositoryHwang.save(foundOrder);
                             /*  여기에 완제품 입고 및 출고 메소드 삽입  */
-//                            (Long workOrder.getWorkOrderOutput(), LocalDateTime workOrder.setWorkOrderFinishDate());
-//                            (Long workOrder.getWorkOrderOutput(), LocalDateTime workOrder.setWorkOrderFinishDate());
+//                            (Order order, Long workOrder.getWorkOrderOutput(), LocalDateTime workOrder.setWorkOrderFinishDate(), ProductName foundOrder.getOrderProductType());
+//                            (Order order, Long workOrder.getWorkOrderOutput(), LocalDateTime workOrder.setWorkOrderFinishDate(), ProductName foundOrder.getOrderProductType());
                         } else {
                             /*  여기에 완제품 입고 메소드 삽입   */
                         }

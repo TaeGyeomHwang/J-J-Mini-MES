@@ -63,6 +63,8 @@ public class OrderServiceHwang {
                     order.setOrderIsEmergency(orderFormDto.isOrderIsEmergency());
                     order.setOrderStatus(OrderStatus.SHIPPED);
                     /*  여기에 완제품 출고 메소드 삽입   */
+//                    (Order order, Long orderFormDto.getOrderAmount(), LocalDateTime currentTime.getCurrentTimeValue(), ProductName orderFormDto.getProductName());
+
                 } else {
                     order.setOrderIsEmergency(orderFormDto.isOrderIsEmergency());
                     order.setOrderStatus(OrderStatus.BEFORE_REGISTER);
@@ -86,6 +88,8 @@ public class OrderServiceHwang {
                 order.setOrderIsEmergency(orderFormDto.isOrderIsEmergency());
                 order.setOrderStatus(OrderStatus.SHIPPED);
                 /*  여기에 완제품 출고 메소드 삽입   */
+//                (Order order, Long orderFormDto.getOrderAmount(), LocalDateTime currentTime.getCurrentTimeValue(), ProductName orderFormDto.getProductName());
+
                 orderRepositoryHwang.save(order);
                 break;
         }
