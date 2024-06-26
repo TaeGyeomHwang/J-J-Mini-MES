@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>수주 목록</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
 </head>
 
 <th:block layout:fragment="css">
@@ -44,7 +45,19 @@
         }
 
         .dataTables_info {
+        }
 
+        .btn-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-right {
+            margin-left: auto;
+        }
+
+        .dataTables_wrapper .dt-buttons {
+            float: right;
         }
     </style>
 </th:block>
@@ -52,7 +65,10 @@
 <div layout:fragment="content" class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
         <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">수주 목록</h1>
-        <a href="/order/new" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">수주 추가</a>
+        <div class="btn-container btn-right">
+            <a href="/order/new" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">수주 추가</a>
+            <a href="/order/excel/new" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">엑셀로 추가</a>
+        </div>
     </div>
     <table id="myTable" class="display">
         <thead>
@@ -78,6 +94,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8"
             src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
     <script>
         $(document).ready(function () {
             $('#myTable').DataTable({
@@ -133,7 +155,7 @@
                     { "data": "orderStatus" }
                 ],
                 "paging": true,
-                "lengthMenu": [ 10, 25, 50, 100 ],
+                "lengthMenu": [10, 25, 50, 100],
                 "pageLength": 10,
                 "language": {
                     "lengthMenu": "_MENU_ 개 단위",
@@ -142,7 +164,15 @@
                         "previous": "이전",
                         "next": "이후"
                     }
-                }
+                },
+                "dom": '<"top"lfB>rt<"bottom"ip><"clear">',  // l - length changing input control, f - filtering input, B - buttons
+                "buttons": [
+                    {
+                        extend: 'excelHtml5',
+                        title: '수주 목록',
+                        text: 'Excel로 다운로드'
+                    }
+                ]
             });
 
             function formatDate(dateString) {

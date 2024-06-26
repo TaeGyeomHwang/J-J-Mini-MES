@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <meta charset="UTF-8">
+    <title>수주 엑셀로 추가</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+    <style>
+        select {
+            width: 250px;
+        }
+        #excelTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        #excelTable th, #excelTable td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        #fileInput, #uploadButton {
+            margin-bottom: 20px;
+        }
+        #submitButtonContainer {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</th:block>
+
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $('#uploadButton').click(function () {
+                var fileInput = document.getElementById('fileInput');
+                var file = fileInput.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var data = new Uint8Array(e.target.result);
+                        var workbook = XLSX.read(data, { type: 'array' });
+                        var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        var rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                        console.log('Rows read from Excel:', rows);
+
+                        var isValid = validateExcel(rows);
+                        if (isValid) {
+                            displayExcelTable(rows);
+                        } else {
+                            alert("엑셀 파일이 올바르지 않습니다.");
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+
+            function validateExcel(rows) {
+                console.log('Rows length:', rows.length);
+                if (rows.length < 2) {
+                    console.log('Validation failed: not enough rows');
+                    return false;
+                }
+                for (var i = 1; i < rows.length; i++) {
+                    var row = rows[i];
+                    console.log('Validating row:', row);
+                    if (row.length !== 5) {
+                        console.log('Validation failed: row length is not 5');
+                        return false;
+                    }
+                    if (!['COMPANY', 'GENERAL'].includes(row[0])) {
+                        console.log('Validation failed: invalid order type', row[0]);
+                        return false;
+                    }
+                    if (!['CABBAGE_JUICE', 'GARLIC_JUICE', 'POMEGRANATE_JELLY', 'PLUM_JELLY'].includes(row[1])) {
+                        console.log('Validation failed: invalid product name', row[1]);
+                        return false;
+                    }
+                    if (isNaN(row[2]) || row[2] < 1 || row[2] > 1000) {
+                        console.log('Validation failed: invalid order amount', row[2]);
+                        return false;
+                    }
+                    if (typeof row[3] !== 'string' || row[3].trim() === '') {
+                        console.log('Validation failed: invalid customer name', row[3]);
+                        return false;
+                    }
+                    var emergencyStatus = row[4].toString().toLowerCase();
+                    if (!['true', 'false'].includes(emergencyStatus)) {
+                        console.log('Validation failed: invalid emergency status', row[4]);
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function displayExcelTable(rows) {
+                var tableHtml = '<table id="excelTable"><thead><tr>';
+                tableHtml += '<th>수주 유형</th><th>제품명</th><th>주문량</th><th>업체명/고객명</th><th>긴급 여부</th>';
+                tableHtml += '</tr></thead><tbody>';
+
+                for (var i = 1; i < rows.length; i++) {
+                    tableHtml += '<tr>';
+                    for (var j = 0; j < rows[i].length; j++) {
+                        tableHtml += '<td>' + rows[i][j] + '</td>';
+                    }
+                    tableHtml += '</tr>';
+                }
+                tableHtml += '</tbody></table>';
+
+                $('#tableContainer').html(tableHtml);
+                $('#submitButtonContainer').show();
+            }
+
+            $('#submitButton').click(function () {
+                var tableData = [];
+                $('#excelTable tbody tr').each(function () {
+                    var row = [];
+                    $(this).find('td').each(function () {
+                        row.push($(this).text());
+                    });
+                    tableData.push(row);
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/order/excel/upload',
+                    contentType: 'application/json',
+                    data: JSON.stringify(tableData),
+                    success: function (response) {
+                        alert('수주가 성공적으로 추가되었습니다.');
+                        window.location.href = '/orders';
+                    },
+                    error: function (error) {
+                        alert('수주 추가 중 오류가 발생하였습니다.');
+                    }
+                });
+            });
+        });
+    </script>
+</th:block>
+
+<div layout:fragment="content" class="container-fluid" style="margin-top: 10px">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
+        <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">수주 엑셀로 추가</h1>
+    </div>
+
+    <input type="file" id="fileInput">
+    <button id="uploadButton">확인</button>
+    <div id="tableContainer"></div>
+
+    <div id="submitButtonContainer" style="display:none;">
+        <a href="/orders" class="d-none d-sm-inline-block btn btn-danger shadow-sm">취소하기</a>
+        <button id="submitButton" class="btn btn-primary">추가하기</button>
+    </div>
+</div>
+</html>

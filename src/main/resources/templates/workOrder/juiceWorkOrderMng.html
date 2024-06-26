@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>즙 작업지시</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
 </head>
 
 <th:block layout:fragment="css">
@@ -46,6 +47,26 @@
         .dataTables_info {
 
         }
+        .filter-container {
+            margin-bottom: 20px;
+        }
+
+        .filter-container select {
+            margin-right: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-right {
+            margin-left: auto;
+        }
+
+        .dataTables_wrapper .dt-buttons {
+            float: right;
+        }
     </style>
 </th:block>
 
@@ -82,6 +103,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8"
             src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
     <script>
         $(document).ready(function () {
             var table = $('#myTable').DataTable({
@@ -138,7 +165,15 @@
                         "previous": "이전",
                         "next": "이후"
                     }
-                }
+                },
+                "dom": '<"top"lfB>rt<"bottom"ip><"clear">',  // l - length changing input control, f - filtering input, B - buttons
+                "buttons": [
+                    {
+                        extend: 'excelHtml5',
+                        title: '즙 작업지시',
+                        text: 'Excel로 다운로드'
+                    }
+                ]
             });
 
             // 날짜 선택 폼 서브밋 처리
