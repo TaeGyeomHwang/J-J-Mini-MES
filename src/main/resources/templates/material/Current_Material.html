@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원자재 재고 현황</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+</head>
+
+<th:block layout:fragment="css">
+    <style>
+        .container-fluid {
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+            font-size: 20px;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content" class="container-fluid">
+    <!-- 페이지 헤딩 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
+        <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">원자재 재고 현황</h1>
+    </div>
+    <table id="Current_Material_Table" style="width: 800px">
+        <thead>
+        <tr>
+            <th>원자재명</th>
+            <th>원자재량</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="material : ${currentMaterials}">
+            <td th:text="${material.currentMaterialName.description}">원자재명</td>
+            <td>
+                <span th:text="${material.currentMaterialAmount}">원자재량</span>
+                <span th:text="${materialUnits[material.currentMaterialName.name()]}">단위</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<th:block layout:fragment="script">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready( function () {
+            const table = $('#Current_Material_Table').DataTable({
+                paging: false,
+                searching: false,
+                ordering: false,
+                info: false
+            });
+        });
+    </script>
+</th:block>
+</html>

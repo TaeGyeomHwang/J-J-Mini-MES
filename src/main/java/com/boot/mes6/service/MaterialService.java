@@ -146,9 +146,9 @@ public class MaterialService {
 
                     materialAmount -= MAX_ORDER_AMOUNT;
 
-                    //발주를 계속하다가 금요일이 되었다면 토,일에는 발주접수가 불가능하니 다시 월요일 12시로 조정
-                    if(materialReceiptDate.getDayOfWeek() == DayOfWeek.FRIDAY)
-                        materialReceiptDate = materialReceiptDate.plusDays(3).withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
+                    //발주를 계속하다가 토요일이 되었다면 토,일에는 발주접수가 불가능하니 다시 월요일 12시로 조정
+                    if(materialReceiptDate.getDayOfWeek() == DayOfWeek.SATURDAY)
+                        materialReceiptDate = materialReceiptDate.plusDays(2).withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
                 }
             }
         }
@@ -207,9 +207,9 @@ public class MaterialService {
                     materialAmount -= MAX_ORDER_AMOUNT;
                     materialReceiptDate = materialReceiptDate.plusDays(1);
 
-                    //금요일이 되었다면 다시 월요일로
-                    if(materialReceiptDate.getDayOfWeek() == DayOfWeek.FRIDAY){
-                        materialReceiptDate.plusDays(3).withHour(cutTime).withMinute(0).withSecond(0).withNano(0); // 다시 월요일로 맞춰주기
+                    //토요일이 되었다면 다시 월요일로
+                    if(materialReceiptDate.getDayOfWeek() == DayOfWeek.SATURDAY){
+                        materialReceiptDate.plusDays(2).withHour(cutTime).withMinute(0).withSecond(0).withNano(0); // 다시 월요일로 맞춰주기
                     }
 
                     //2000보다 작거나 같아지면 발주하고 반복 아웃

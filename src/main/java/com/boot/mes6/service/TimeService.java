@@ -88,14 +88,14 @@ public class TimeService {
             case CABBAGE:
             case GARLIC:
             case HONEY:
-                return receiptDate.plusDays(2);
+                return receiptDate.plusDays(2).withHour(9).withMinute(0).withSecond(0).withNano(0);
             case POMEGRANATE:
             case PLUM:
             case COLLAGEN:
             case BOX:
-                return receiptDate.plusDays(3);
+                return receiptDate.plusDays(3).withHour(9).withMinute(0).withSecond(0).withNano(0);
             case WRAPPER:
-                return receiptDate.plusDays(7);
+                return receiptDate.plusDays(7).withHour(9).withMinute(0).withSecond(0).withNano(0);
             default:
                 return null;
         }
