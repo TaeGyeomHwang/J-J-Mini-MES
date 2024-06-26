@@ -25,11 +25,28 @@
                 alert(errorMessage);
             }
         });
+
+        function validateForm() {
+            var orderAmount = document.forms["orderForm"]["orderAmount"].value;
+            var orderCustomerName = document.forms["orderForm"]["orderCustomerName"].value;
+
+            if (orderAmount < 1 || orderAmount > 1000) {
+                alert("주문량은 1에서 1000 사이의 값을 입력해야 합니다.");
+                return false;
+            }
+
+            if (orderCustomerName.trim() === "") {
+                alert("업체명/고객명을 입력해야 합니다.");
+                return false;
+            }
+
+            return true;
+        }
     </script>
 </th:block>
 
 <div layout:fragment="content" class="container-fluid" style="margin-top: 10px">
-    <form action="/order/new" role="form" method="post" th:object="${orderFormDto}">
+    <form name="orderForm" action="/order/new" role="form" method="post" th:object="${orderFormDto}" onsubmit="return validateForm()">
         <h1>수주 추가</h1>
         <div class="form-group">
             <label th:for="orderType">수주 유형</label>
@@ -50,7 +67,7 @@
         </div>
         <div class="form-group">
             <label th:for="orderAmount">주문량</label>
-            <input type="text" th:field="*{orderAmount}" class="form-control" placeholder="주문량(box)을 입력하세요">
+            <input type="number" th:field="*{orderAmount}" class="form-control" placeholder="주문량(box)을 입력하세요">
         </div>
         <div class="form-group">
             <label th:for="orderCustomerName">업체명/고객명</label>
