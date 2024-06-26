@@ -4,7 +4,6 @@ import com.boot.mes6.constant.OrderType;
 import com.boot.mes6.constant.ProductName;
 import com.boot.mes6.entity.Order;
 import com.boot.mes6.entity.ProductInOut;
-import com.boot.mes6.repository.CurrentProductRepositoryHwang;
 import com.boot.mes6.repository.ProductInOutRepositoryHwang;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,28 +20,28 @@ import java.util.List;
 public class ProductInOutServiceHwang {
     private final ProductInOutRepositoryHwang productInOutRepositoryHwang;
     private final CurrentProductServiceHwang currentProductServiceHwang;
-    
+
     //  더미 완제품 입출고 이력 데이터 생성
-    public void createDummyProductLog(){
+    public void createDummyProductLog() {
         ProductInOut productInOut1 = new ProductInOut();
         productInOut1.setProductName(ProductName.CABBAGE_JUICE);
         productInOut1.setProductInoutAmount(123L);
-        productInOut1.setProductInDate(LocalDateTime.of(2024,6,25,12,0, 0));
+        productInOut1.setProductInDate(LocalDateTime.of(2024, 6, 25, 12, 0, 0));
 
         ProductInOut productInOut2 = new ProductInOut();
         productInOut2.setProductName(ProductName.GARLIC_JUICE);
         productInOut2.setProductInoutAmount(246L);
-        productInOut2.setProductInDate(LocalDateTime.of(2024,7,25,12,0, 0));
+        productInOut2.setProductInDate(LocalDateTime.of(2024, 7, 25, 12, 0, 0));
 
         ProductInOut productInOut3 = new ProductInOut();
         productInOut3.setProductName(ProductName.POMEGRANATE_JELLY);
         productInOut3.setProductInoutAmount(90L);
-        productInOut3.setProductInDate(LocalDateTime.of(2024,6,25,12,0, 0));
+        productInOut3.setProductInDate(LocalDateTime.of(2024, 6, 25, 12, 0, 0));
 
         ProductInOut productInOut4 = new ProductInOut();
         productInOut4.setProductName(ProductName.PLUM_JELLY);
         productInOut4.setProductInoutAmount(100L);
-        productInOut4.setProductInDate(LocalDateTime.of(2024,7,25,12,0, 0));
+        productInOut4.setProductInDate(LocalDateTime.of(2024, 7, 25, 12, 0, 0));
 
         productInOutRepositoryHwang.save(productInOut1);
         productInOutRepositoryHwang.save(productInOut2);
@@ -64,34 +63,41 @@ public class ProductInOutServiceHwang {
     //order에서 업체인지 개인인지, 긴급인지 아닌지
     //완제품 입출고 이력에 추가할 때 필요 정보는 완제품명(order.getProductType()), 입고량(productAmount, 입고일(inDate)
     public void productIn(Order order, Long productAmount, LocalDateTime inDate) {
-        //완제품 입출고 이력에 추가
-        //(업체와 개인이) 긴급인지 긴급이라면 안전 재고량으로 입고 아니면 밑으로
-        //긴급일 때
-        if(order.isOrderIsEmergency()) {
-            //완제품 입출고 이력에 추가(입고)
-            productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, inDate, 1));
-
-            //완제품 재고량에 안전 재고량 추가(입고)
-            currentProductServiceHwang.addSafeProduct(order.getOrderProductType(), productAmount);
-
-        } else {
-            //긴급 아닐 때
-            //업체인지 개인인지, 업체면 일반 재고량 입고, 개인이면 안전 재고량 입고
-            //업체일 때
-            if(order.getOrderType().equals(OrderType.COMPANY)) {
+        try {
+            //완제품 입출고 이력에 추가
+            //(업체와 개인이) 긴급인지 긴급이라면 안전 재고량으로 입고 아니면 밑으로
+            //긴급일 때
+            if (order.isOrderIsEmergency()) {
                 //완제품 입출고 이력에 추가(입고)
-                productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, inDate, 1));
-
-                //완제품 재고량에 일반 재고량 추가(입고)
-                currentProductServiceHwang.addNormalProduct(order.getOrderProductType(), productAmount);
-
-            } else {
-                //개인일 때
                 productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, inDate, 1));
 
                 //완제품 재고량에 안전 재고량 추가(입고)
                 currentProductServiceHwang.addSafeProduct(order.getOrderProductType(), productAmount);
+
+            } else {
+                //긴급 아닐 때
+                //업체인지 개인인지, 업체면 일반 재고량 입고, 개인이면 안전 재고량 입고
+                //업체일 때
+                if (order.getOrderType().equals(OrderType.COMPANY)) {
+                    //완제품 입출고 이력에 추가(입고)
+                    ProductInOut savedProductInOut = productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, inDate, 1));
+                    System.out.println("Saved ProductInOut: " + savedProductInOut);
+
+                    //완제품 재고량에 일반 재고량 추가(입고)
+                    currentProductServiceHwang.addNormalProduct(order.getOrderProductType(), productAmount);
+
+                } else {
+                    //개인일 때
+                    productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, inDate, 1));
+
+                    //완제품 재고량에 안전 재고량 추가(입고)
+                    currentProductServiceHwang.addSafeProduct(order.getOrderProductType(), productAmount);
+                }
             }
+        } catch (Exception e) {
+            System.out.println("Exception occurred during productIn: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // 예외를 다시 던져서 트랜잭션 관리가 계속되도록 합니다.
         }
     }
 
@@ -101,7 +107,7 @@ public class ProductInOutServiceHwang {
         //(업체와 개인이) 긴급인지 긴급이라면 안전 재고량으로 출고 아니면 밑으로
         //업체인지 개인인지, 업체면 일반 재고량 출고, 개인이면 안전 재고량 출고
         //긴급일 때
-        if(order.isOrderIsEmergency()) {
+        if (order.isOrderIsEmergency()) {
             //완제품 입출고 이력에 추가(출고)
             productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, outDate, 0));
 
@@ -112,7 +118,7 @@ public class ProductInOutServiceHwang {
             //긴급 아닐 때
             //업체인지 개인인지, 업체면 일반 재고량 출고, 개인이면 안전 재고량 출고
             //업체일 때
-            if(order.getOrderType().equals(OrderType.COMPANY)) {
+            if (order.getOrderType().equals(OrderType.COMPANY)) {
                 //완제품 입출고 이력에 추가(출고)
                 productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, outDate, 0));
 
@@ -134,12 +140,13 @@ public class ProductInOutServiceHwang {
         ProductInOut productInOut = new ProductInOut();
         productInOut.setProductName(productName);
         productInOut.setProductInoutAmount(productAmount);
-        if(isIn == 1) {
+        if (isIn == 1) {
             productInOut.setProductInDate(Date); //입고일
         } else {
             productInOut.setProductOutDate(Date); //출고일
         }
 
+        System.out.println("ProductInOut to save: " + productInOut);
         return productInOut;
     }
 }
