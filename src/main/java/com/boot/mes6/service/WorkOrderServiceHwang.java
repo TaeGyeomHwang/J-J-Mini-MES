@@ -279,6 +279,10 @@ public class WorkOrderServiceHwang {
                         }
                     }
                 }
+                Plan plan = planRepository.findById(workOrder.getPlan().getPlanNo())
+                        .orElseThrow(EntityNotFoundException::new);
+                plan.setPlanFinishDate(plan.getPlanExpectFinishDate());
+                planRepository.save(plan);
             }
             workOrder.setWorkOrderStatus(WorkOrderStatus.COMPLETE);
             workOrder.setWorkOrderFinishDate(workOrder.getWorkOrderExpectDate());
