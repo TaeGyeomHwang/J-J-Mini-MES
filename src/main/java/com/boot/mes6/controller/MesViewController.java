@@ -2,7 +2,9 @@ package com.boot.mes6.controller;
 
 import com.boot.mes6.dto.DataTableResponse;
 import com.boot.mes6.dto.ResponseMaterial;
+import com.boot.mes6.entity.CurrentMaterial;
 import com.boot.mes6.entity.MaterialInOut;
+import com.boot.mes6.service.CurrentMaterialService;
 import com.boot.mes6.service.MaterialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,13 +16,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 public class MesViewController {
     private final MaterialService materialService;
+    private final CurrentMaterialService currentMaterialService;
 
     // 원자재 입출고 관리 페이지
     @GetMapping("/materialinout")
@@ -29,12 +34,13 @@ public class MesViewController {
 
         //model.addAttribute("materials", materials);
 
-        return "Material_in_out";
+        return "material/Material_in_out";
     }
 
+    //테스트할 때 쓰는 페이지
     @GetMapping("/materialAdd")
     public String materialAdd() {
-        return "Material_Add";
+        return "material/Material_Add";
     }
 
     // 원자재 입출고 관리 테이블 정보
@@ -73,5 +79,28 @@ public class MesViewController {
         response.setData(responseMaterials);
 
         return ResponseEntity.ok().body(response);
+    }
+
+    //원자재 재고 현황 페이지
+    @GetMapping("/currentMaterial")
+    public String currentMaterial(Model model) {
+        List<CurrentMaterial> currentMaterials = currentMaterialService.getCurrentMaterial();
+
+        //model을 사용하여 뷰에 데이터 전달
+        // 각 원자재의 단위를 설정
+        Map<String, String> materialUnits = new HashMap<>();
+        materialUnits.put("CABBAGE", "kg");
+        materialUnits.put("GARLIC", "kg");
+        materialUnits.put("HONEY", "L");
+        materialUnits.put("POMEGRANATE", "L");
+        materialUnits.put("PLUM", "L");
+        materialUnits.put("COLLAGEN", "L");
+        materialUnits.put("WRAPPER", "개");
+        materialUnits.put("BOX", "개");
+
+        model.addAttribute("currentMaterials", currentMaterials);
+        model.addAttribute("materialUnits", materialUnits);
+
+        return "material/Current_Material";
     }
 }
