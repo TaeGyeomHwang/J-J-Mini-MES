@@ -188,19 +188,19 @@ public class PlanServiceHwang {
             case CABBAGE_JUICE:
             case GARLIC_JUICE:
                 if (isBusinessDay(orderDate) && orderDateTime.toLocalTime().isBefore(LocalTime.NOON)) {
-                    materialOrderDateTime = orderDate.atTime(12, 0);
+                    materialOrderDateTime = orderDate.atTime(9, 0);
                 } else {
                     LocalDate nextBusinessDay = getNextBusinessDay(orderDate);
-                    materialOrderDateTime = nextBusinessDay.atTime(12, 0);
+                    materialOrderDateTime = nextBusinessDay.atTime(9, 0);
                 }
                 break;
             case POMEGRANATE_JELLY:
             case PLUM_JELLY:
                 if (isBusinessDay(orderDate) && orderDateTime.toLocalTime().isBefore(LocalTime.of(15, 0))) {
-                    materialOrderDateTime = orderDate.atTime(15, 0);
+                    materialOrderDateTime = orderDate.atTime(9, 0);
                 } else {
                     LocalDate nextBusinessDay = getNextBusinessDay(orderDate);
-                    materialOrderDateTime = nextBusinessDay.atTime(15, 0);
+                    materialOrderDateTime = nextBusinessDay.atTime(9, 0);
                 }
                 break;
         }
