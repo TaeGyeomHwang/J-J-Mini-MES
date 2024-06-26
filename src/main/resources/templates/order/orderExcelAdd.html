@@ -18,11 +18,19 @@
         #excelTable {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         #excelTable th, #excelTable td {
             border: 1px solid black;
             padding: 8px;
             text-align: left;
+        }
+        #fileInput, #uploadButton {
+            margin-bottom: 20px;
+        }
+        #submitButtonContainer {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </th:block>
@@ -42,6 +50,8 @@
                         var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                         var rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
+                        console.log('Rows read from Excel:', rows);
+
                         var isValid = validateExcel(rows);
                         if (isValid) {
                             displayExcelTable(rows);
@@ -54,27 +64,37 @@
             });
 
             function validateExcel(rows) {
+                console.log('Rows length:', rows.length);
                 if (rows.length < 2) {
+                    console.log('Validation failed: not enough rows');
                     return false;
                 }
                 for (var i = 1; i < rows.length; i++) {
                     var row = rows[i];
+                    console.log('Validating row:', row);
                     if (row.length !== 5) {
+                        console.log('Validation failed: row length is not 5');
                         return false;
                     }
                     if (!['COMPANY', 'GENERAL'].includes(row[0])) {
+                        console.log('Validation failed: invalid order type', row[0]);
                         return false;
                     }
                     if (!['CABBAGE_JUICE', 'GARLIC_JUICE', 'POMEGRANATE_JELLY', 'PLUM_JELLY'].includes(row[1])) {
+                        console.log('Validation failed: invalid product name', row[1]);
                         return false;
                     }
                     if (isNaN(row[2]) || row[2] < 1 || row[2] > 1000) {
+                        console.log('Validation failed: invalid order amount', row[2]);
                         return false;
                     }
                     if (typeof row[3] !== 'string' || row[3].trim() === '') {
+                        console.log('Validation failed: invalid customer name', row[3]);
                         return false;
                     }
-                    if (!['true', 'false'].includes(String(row[4]))) {
+                    var emergencyStatus = row[4].toString().toLowerCase();
+                    if (!['true', 'false'].includes(emergencyStatus)) {
+                        console.log('Validation failed: invalid emergency status', row[4]);
                         return false;
                     }
                 }
@@ -96,7 +116,7 @@
                 tableHtml += '</tbody></table>';
 
                 $('#tableContainer').html(tableHtml);
-                $('#submitButton').show();
+                $('#submitButtonContainer').show();
             }
 
             $('#submitButton').click(function () {
@@ -135,6 +155,10 @@
     <input type="file" id="fileInput">
     <button id="uploadButton">확인</button>
     <div id="tableContainer"></div>
-    <button id="submitButton" style="display:none;">추가하기</button>
+
+    <div id="submitButtonContainer" style="display:none;">
+        <a href="/orders" class="d-none d-sm-inline-block btn btn-danger shadow-sm">취소하기</a>
+        <button id="submitButton" class="btn btn-primary">추가하기</button>
+    </div>
 </div>
 </html>

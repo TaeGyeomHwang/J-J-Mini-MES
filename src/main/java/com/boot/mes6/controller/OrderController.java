@@ -136,11 +136,25 @@ public class OrderController {
                 orderFormDto.setOrderCustomerName(row.get(3));
                 orderFormDto.setOrderIsEmergency(Boolean.parseBoolean(row.get(4)));
 
-                orderServiceHwang.saveOrderManual(orderFormDto);
+                //  수주 추가
+                Long orderNo = orderServiceHwang.saveOrderManual(orderFormDto);
+
+                //  생산계획 추가 또는 합병
+                Order order = orderRepositoryHwang.findById(orderNo)
+                        .orElseThrow(EntityNotFoundException::new);
+                Long planNo = planServiceHwang.createOrMergePlan(order);
+
+                //  수주 예상 납기일 설정
+                List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findListByPlanNo(planNo);
+                for (OrderPlanMap orderPlanMap : orderPlanMapList){
+                    Order findOrder = orderRepositoryHwang.findById(orderPlanMap.getOrder().getOrderNo())
+                            .orElseThrow(EntityNotFoundException::new);
+                    Long updatedOrderNo = orderServiceHwang.updateOrderExpectDate(findOrder, planNo);
+                }
             }
-            return ResponseEntity.ok().body("Orders successfully added.");
+            return ResponseEntity.ok().body("엑셀 파일로 수주 추가 성공");
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("An error occurred while processing the Excel file.");
+            return ResponseEntity.status(500).body("엑셀 파일 처리중 에러 발생");
         }
     }
 }
