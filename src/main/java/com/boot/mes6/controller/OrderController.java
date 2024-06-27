@@ -156,6 +156,9 @@ public class OrderController {
                             .orElseThrow(EntityNotFoundException::new);
                     Long updatedOrderNo = orderServiceHwang.updateOrderExpectDate(findOrder, planNo);
                 }
+
+                //  수주 추가 후 원자재 자동 발주
+                materialService.autoAddMaterial(order);
             }
             return ResponseEntity.ok().body("엑셀 파일로 수주 추가 성공");
         } catch (Exception e) {

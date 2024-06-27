@@ -51,6 +51,7 @@ public class MaterialService {
         long orderAmount = order.getOrderAmount();
         ProductName orderProductType = order.getOrderProductType();
         LocalDateTime materialOrderDate = order.getOrderDate();
+        System.out.println("materialOrderDate의 값: "+materialOrderDate);
         long materialAmount = 0L;
         long subMaterialAmount = 0L;
         final long MAX_JUICE_ORDER_AMOUNT = 2000L;
@@ -111,6 +112,7 @@ public class MaterialService {
             //orderDate가 금요일 오후, 토요일, 일요일도 아니고 오전이면 당일 12시로 설정
             materialReceiptDate = materialOrderDate.withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
         }
+        System.out.println("materialReceiptDate의 값: "+materialReceiptDate);
 
         //원자재 입출고 관리 테이블에서 '같은 원자재'를 가진 애들 중 이력ID가 가장 큰(마지막)인 발주 접수일을 가져온다.;
         //LocalDateTime lastMaterialReceiptDate = materialRepository.find;
@@ -129,6 +131,7 @@ public class MaterialService {
             if (materialAmount < MAX_ORDER_AMOUNT) {
                 System.out.println("싯팔  ?"+materialAmount);
                 //원자재명, 발주량, 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
+                System.out.println("발주할 원자재가 최대 2000을 넘지 않으면 바로 발주에서 materialReceiptDate의 값: "+materialReceiptDate);
                 materialRepository.save(createMaterialOrder(order, materialName, materialAmount, supplierName, materialOrderDate, materialReceiptDate));
             } else {
                 //발주해야할 원자재가 2000이 넘었다면 반복해서 발주
@@ -155,17 +158,47 @@ public class MaterialService {
 
         //가져온 list가 안 비었다면
         else {
-            //테이블에서 해당 원자재의 마지막 발주 접수일을 가져옴
-            //그래야 발주 접수일 날짜가 바뀌었을 때 그것을 기준으로 다음날 주문 가능
-            //결론은 발주 접수일을 맞추기 위해서
-            materialReceiptDate = materialRepository.findLatestMaterialInOut(materialName.toString());
+            if (materialInOuts.get(0).getMaterialReceiptDate().isBefore(order.getOrderDate())){
+                //발주할 원자재가 최대 2000을 넘지 않으면 바로 발주
+                if (materialAmount < MAX_ORDER_AMOUNT) {
+                    System.out.println("싯팔  ?"+materialAmount);
+                    //원자재명, 발주량, 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
+                    System.out.println("발주할 원자재가 최대 2000을 넘지 않으면 바로 발주에서 materialReceiptDate의 값: "+materialReceiptDate);
+                    materialRepository.save(createMaterialOrder(order, materialName, materialAmount, supplierName, materialOrderDate, materialReceiptDate));
+                } else {
+                    //발주해야할 원자재가 2000이 넘었다면 반복해서 발주
+                    while(materialAmount >= 0) {
+                        //ex)5000kg을 발주해야한다면 2000을 2번해야함
+                        if(materialAmount >= MAX_ORDER_AMOUNT) {
+                            //원자재명, 발주량 = MAX_ORDER_AMOUNT, 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
+                            materialRepository.save(createMaterialOrder(order, materialName, MAX_ORDER_AMOUNT, supplierName, materialOrderDate, materialReceiptDate));
+                            materialReceiptDate = materialReceiptDate.plusDays(1);
+                        } else {
+                            //2000을 계속 빼다가 2000미만이 되면 남은 만큼 발주
+                            //원자재명, 발주량 = materialAmount, 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
+                            materialRepository.save(createMaterialOrder(order, materialName, materialAmount, supplierName, materialOrderDate, materialReceiptDate));
+                        }
 
-            //일단 가져온 list의 발주량의 합을 구한다.
-            Long materialAmountSum = 0L;
-            for (MaterialInOut materialInOut : materialInOuts) {
-                materialAmountSum += materialInOut.getMaterialInoutAmount();
-            }
-            System.out.println(materialAmountSum);
+                        materialAmount -= MAX_ORDER_AMOUNT;
+
+                        //발주를 계속하다가 토요일이 되었다면 토,일에는 발주접수가 불가능하니 다시 월요일 12시로 조정
+                        if(materialReceiptDate.getDayOfWeek() == DayOfWeek.SATURDAY)
+                            materialReceiptDate = materialReceiptDate.plusDays(2).withHour(cutTime).withMinute(0).withSecond(0).withNano(0);
+                    }
+                }
+            }else {
+                //테이블에서 해당 원자재의 마지막 발주 접수일을 가져옴
+                //그래야 발주 접수일 날짜가 바뀌었을 때 그것을 기준으로 다음날 주문 가능
+                //결론은 발주 접수일을 맞추기 위해서
+                materialReceiptDate = materialRepository.findLatestMaterialInOut(materialName.toString());
+
+                //일단 가져온 list의 발주량의 합을 구한다.
+                Long materialAmountSum = 0L;
+                for (MaterialInOut materialInOut : materialInOuts) {
+                    System.out.println("materialInOut의 번호: "+materialInOut.getMaterialNo());
+                    materialAmountSum += materialInOut.getMaterialInoutAmount();
+                }
+                System.out.println(materialAmountSum);
 
             /*//그 애들의 발주량의 합이 2000과 같은가?
             if(MaterialOrderAmountSum == 2000) {
@@ -180,49 +213,50 @@ public class MaterialService {
                 //이 경우는 생기지 않음
             }*/
 
-            //발주량의 합이 2000이 안넘는다.
-            //발주할 수 있는 남은 양 계산
-            Long maxMaterialOrderAmount = MAX_ORDER_AMOUNT;
-            maxMaterialOrderAmount -= materialAmountSum;
-            System.out.println("남은 양 : " + maxMaterialOrderAmount);
+                //발주량의 합이 2000이 안넘는다.
+                //발주할 수 있는 남은 양 계산
+                Long maxMaterialOrderAmount = MAX_ORDER_AMOUNT;
+                maxMaterialOrderAmount -= materialAmountSum;
+                System.out.println("남은 양 : " + maxMaterialOrderAmount);
 
-            //들어온 양배추량이 max치(발주할 수 있는 남은 양)를 넘는가
-            if(materialAmount > maxMaterialOrderAmount) {
-                //원자재명, 발주량(maxMaterialOrderAmount), 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
-                materialRepository.save(createMaterialOrder(order, materialName, maxMaterialOrderAmount, supplierName, materialOrderDate, materialReceiptDate));
-                materialAmount -= maxMaterialOrderAmount;
-                System.out.println("dkdrlahEL: " + materialReceiptDate);
-                materialReceiptDate = materialReceiptDate.plusDays(1);
-                System.out.println("dkdrlahEL: " + materialReceiptDate.plusDays(1));
-            }
-
-            //위에서 발주하고도 2000 이상인지
-            if (materialAmount > MAX_ORDER_AMOUNT) {
-                //2000을 save하고 2000을 빼면서 2000보다 작아질 때 까지 반복
-                while (true) {
-                    //최대 수량만큼 발주
-                    //원자재명, 발주량(MAX_ORDER_AMOUNT), 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
-                    System.out.println("여기다 이거야: " + materialReceiptDate);
-                    materialRepository.save(createMaterialOrder(order, materialName, MAX_ORDER_AMOUNT, supplierName, materialOrderDate, materialReceiptDate));
-                    materialAmount -= MAX_ORDER_AMOUNT;
+                //들어온 양배추량이 max치(발주할 수 있는 남은 양)를 넘는가
+                if(materialAmount > maxMaterialOrderAmount) {
+                    //원자재명, 발주량(maxMaterialOrderAmount), 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
+                    materialRepository.save(createMaterialOrder(order, materialName, maxMaterialOrderAmount, supplierName, materialOrderDate, materialReceiptDate));
+                    materialAmount -= maxMaterialOrderAmount;
+                    System.out.println("dkdrlahEL: " + materialReceiptDate);
                     materialReceiptDate = materialReceiptDate.plusDays(1);
-
-                    //토요일이 되었다면 다시 월요일로
-                    if(materialReceiptDate.getDayOfWeek() == DayOfWeek.SATURDAY){
-                        materialReceiptDate.plusDays(2).withHour(cutTime).withMinute(0).withSecond(0).withNano(0); // 다시 월요일로 맞춰주기
-                    }
-
-                    //2000보다 작거나 같아지면 발주하고 반복 아웃
-                    if(materialAmount <= MAX_ORDER_AMOUNT) {
-                        //원자재명, 발주량(materialAmount), 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
-                        materialRepository.save(createMaterialOrder(order, materialName, materialAmount, supplierName, materialOrderDate, materialReceiptDate));
-                        break;
-                    }
+                    System.out.println("dkdrlahEL: " + materialReceiptDate.plusDays(1));
                 }
-            } else {
-                //발주하고 2000 이상이 아니면 바로 발주 가능
-                //원자재명, 발주량(materialAmount), 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
-                materialRepository.save(createMaterialOrder(order, materialName, materialAmount, supplierName, materialOrderDate, materialReceiptDate));
+
+                //위에서 발주하고도 2000 이상인지
+                if (materialAmount > MAX_ORDER_AMOUNT) {
+                    //2000을 save하고 2000을 빼면서 2000보다 작아질 때 까지 반복
+                    while (true) {
+                        //최대 수량만큼 발주
+                        //원자재명, 발주량(MAX_ORDER_AMOUNT), 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
+                        System.out.println("여기다 이거야: " + materialReceiptDate);
+                        materialRepository.save(createMaterialOrder(order, materialName, MAX_ORDER_AMOUNT, supplierName, materialOrderDate, materialReceiptDate));
+                        materialAmount -= MAX_ORDER_AMOUNT;
+                        materialReceiptDate = materialReceiptDate.plusDays(1);
+
+                        //토요일이 되었다면 다시 월요일로
+                        if(materialReceiptDate.getDayOfWeek() == DayOfWeek.SATURDAY){
+                            materialReceiptDate.plusDays(2).withHour(cutTime).withMinute(0).withSecond(0).withNano(0); // 다시 월요일로 맞춰주기
+                        }
+
+                        //2000보다 작거나 같아지면 발주하고 반복 아웃
+                        if(materialAmount <= MAX_ORDER_AMOUNT) {
+                            //원자재명, 발주량(materialAmount), 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
+                            materialRepository.save(createMaterialOrder(order, materialName, materialAmount, supplierName, materialOrderDate, materialReceiptDate));
+                            break;
+                        }
+                    }
+                } else {
+                    //발주하고 2000 이상이 아니면 바로 발주 가능
+                    //원자재명, 발주량(materialAmount), 수주번호, 발주일(수주일), 발주 접수일(materialReceiptDate), 상태 set하고 save;
+                    materialRepository.save(createMaterialOrder(order, materialName, materialAmount, supplierName, materialOrderDate, materialReceiptDate));
+                }
             }
         }
     }
@@ -265,6 +299,8 @@ public class MaterialService {
         materialInOut.setMaterialOrderDate(materialOrderDate);
         materialInOut.setMaterialReceiptDate(materialReceiptDate);
         materialInOut.setMaterialStatus(MaterialStatus.PREPARING_SHIP);
+
+        System.out.println("createMaterialOrder에서 materialReceiptDate의 값:"+materialReceiptDate);
         return materialInOut;
     }
 
