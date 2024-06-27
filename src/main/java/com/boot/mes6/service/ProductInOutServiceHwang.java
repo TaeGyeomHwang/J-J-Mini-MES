@@ -81,7 +81,6 @@ public class ProductInOutServiceHwang {
                 if (order.getOrderType().equals(OrderType.COMPANY)) {
                     //완제품 입출고 이력에 추가(입고)
                     ProductInOut savedProductInOut = productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, inDate, 1));
-                    System.out.println("Saved ProductInOut: " + savedProductInOut);
 
                     //완제품 재고량에 일반 재고량 추가(입고)
                     currentProductServiceHwang.addNormalProduct(order.getOrderProductType(), productAmount);

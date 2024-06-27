@@ -49,6 +49,7 @@ public class PlanServiceHwang {
     public Long createOrMergePlan(Order order) {
         LocalDateTime productionDate = null;
         Long orderAmountWithDefective = (long) (order.getOrderAmount() + Math.ceil(order.getOrderAmount() * 0.03));
+        System.out.println("orderAmountWithDefective의 값: "+orderAmountWithDefective);
         Long planNo = null;
 
         // 원자재 발주 접수 전인 동일 제품 수주 찾기
@@ -99,7 +100,7 @@ public class PlanServiceHwang {
             Plan existPlan = orderPlanMap.getPlan();
             Long planAmount = existPlan.getPlanProductionAmount();
             //  해당 생산계획의 생산량 + 현재 수주의 생산량 > 최대 capa인지 확인해서,
-            Long summedAmount = planAmount + order.getOrderAmount();
+            Long summedAmount = planAmount + order.getOrderAmount() + (long) Math.ceil(order.getOrderAmount()*0.03);
             planNo = existPlan.getPlanNo();
             productionDate = existPlan.getPlanStartDate();
             do {

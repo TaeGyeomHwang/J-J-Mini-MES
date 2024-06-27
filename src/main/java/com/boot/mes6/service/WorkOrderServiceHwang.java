@@ -247,8 +247,8 @@ public class WorkOrderServiceHwang {
         List<WorkOrder> workOrderWaiting = workOrderRepositoryHwang.findProcessingOrWaitingWorkOrdersWithCurrentTimeAfterExpectDate();
 
         for (WorkOrder workOrder : workOrderWaiting) {
-            //  해당 작업지시가 전처리 또는 혼합 공정이라면
-            if (workOrder.getWorkOrderProcessName() == ProcessCode.A1 | workOrder.getWorkOrderProcessName() == ProcessCode.B1) {
+            //  해당 작업지시가 진행중이 아니고 전처리 또는 혼합 공정이라면
+            if ((workOrder.getWorkOrderProcessName() == ProcessCode.A1 | workOrder.getWorkOrderProcessName() == ProcessCode.B1) && workOrder.getWorkOrderStatus()!=WorkOrderStatus.PROCESSING) {
                 List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findListByPlanNo(workOrder.getPlan().getPlanNo());
                 for (OrderPlanMap orderPlanMap : orderPlanMapList) {
                     Long orderNo = orderPlanMap.getOrder().getOrderNo();
@@ -266,16 +266,26 @@ public class WorkOrderServiceHwang {
             if (workOrder.getWorkOrderProcessName() == ProcessCode.A7 | workOrder.getWorkOrderProcessName() == ProcessCode.B6) {
                 List<OrderPlanMap> orderPlanMapList = orderPlanMapRepositoryHwang.findFilteredByPlanNo(workOrder.getPlan().getPlanNo());
                 if (orderPlanMapList.size() != 0) {
-                    for (OrderPlanMap orderPlanMap : orderPlanMapList) {
+                    Long producedAmount = workOrder.getWorkOrderOutput();
+                    for (int i=0; i<orderPlanMapList.size(); i++){
+                        System.out.println("producedAmount의 수: "+producedAmount);
+                        OrderPlanMap orderPlanMap = orderPlanMapList.get(i);
                         Order foundOrder = orderPlanMap.getOrder();
+                        System.out.println("foundOrder의 번호: "+foundOrder.getOrderNo());
                         //  이미 출고된 수주인지 확인
                         if (foundOrder.getOrderStatus() != OrderStatus.SHIPPED) {
                             foundOrder.setOrderStatus(OrderStatus.SHIPPED);
                             foundOrder.setOrderOutDate(foundOrder.getOrderExpectShipDate());
                             orderRepositoryHwang.save(foundOrder);
                             /*  여기에 완제품 입고 및 출고 메소드 삽입  */
-                            productInOutServiceHwang.productIn(foundOrder, workOrder.getWorkOrderOutput(), workOrder.getWorkOrderExpectDate());
-//                            productInOutServiceHwang.productOut(foundOrder, workOrder.getWorkOrderOutput(), workOrder.getWorkOrderExpectDate());
+                            if (i!=orderPlanMapList.size()-1){
+                                productInOutServiceHwang.productIn(foundOrder, foundOrder.getOrderAmount(), workOrder.getWorkOrderExpectDate());
+                                productInOutServiceHwang.productOut(foundOrder, foundOrder.getOrderAmount(), workOrder.getWorkOrderExpectDate());
+                                producedAmount -= foundOrder.getOrderAmount();
+                            }else {
+                                productInOutServiceHwang.productIn(foundOrder, producedAmount, workOrder.getWorkOrderExpectDate());
+                                productInOutServiceHwang.productOut(foundOrder, foundOrder.getOrderAmount(), workOrder.getWorkOrderExpectDate());
+                            }
                         } else {
                             /*  여기에 완제품 입고 메소드 삽입   */
                             productInOutServiceHwang.productIn(foundOrder, workOrder.getWorkOrderOutput(), workOrder.getWorkOrderFinishDate());

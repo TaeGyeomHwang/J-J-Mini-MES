@@ -67,17 +67,23 @@ public class CurrentProductServiceHwang {
     }
 
     //완제품 일반 재고량에 추가
+//    public void addNormalProduct(ProductName productName, Long productAmount) {
+//        System.out.println("Adding normal product: " + productName + ", amount: " + productAmount);
+//
+//        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
+//
+//        if (optionalCurrentProduct.isPresent()) {
+//            CurrentProduct currentProduct = optionalCurrentProduct.get();
+//            Long currentProductNormalAmount = currentProduct.getCurrentProductAmount() + productAmount;
+//            currentProduct.setCurrentProductAmount(currentProductNormalAmount);
+//            currentProductRepositoryHwang.save(currentProduct);
+//        }
+//    }
     public void addNormalProduct(ProductName productName, Long productAmount) {
-        System.out.println("Adding normal product: " + productName + ", amount: " + productAmount);
+        CurrentProduct currentProduct = currentProductRepositoryHwang.findByCurrentProductName(productName);
 
-        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
-
-        if (optionalCurrentProduct.isPresent()) {
-            CurrentProduct currentProduct = optionalCurrentProduct.get();
-            Long currentProductNormalAmount = currentProduct.getCurrentProductAmount() + productAmount;
-            currentProduct.setCurrentProductAmount(currentProductNormalAmount);
-            currentProductRepositoryHwang.save(currentProduct);
-        }
+        currentProduct.setCurrentProductAmount(currentProduct.getCurrentProductAmount()+productAmount);
+        currentProductRepositoryHwang.save(currentProduct);
     }
 
     //완제품 안전 재고량에서 빼기
@@ -105,24 +111,29 @@ public class CurrentProductServiceHwang {
 
     //완제품 일반 재고량에서 빼기
     public void minusNormalProduct(ProductName productName, Long productAmount) {
-        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
+//        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
+//
+//        if (optionalCurrentProduct.isPresent()) {
+//            //해당 완재품의 재고가 있는 경우
+//            CurrentProduct currentProduct = optionalCurrentProduct.get();
+//            Long currentProductAmount = currentProduct.getCurrentProductAmount();
+//
+//            if (currentProductAmount >= productAmount) {
+//                //재고가 충분한 경우, 출고량을 차감
+//                currentProduct.setCurrentProductSafeAmount(currentProductAmount - productAmount);
+//                currentProductRepositoryHwang.save(currentProduct);
+//            } else {
+//                //재고가 충분치 않다면 예외
+//                throw new IllegalArgumentException("Insufficient stock for material: " + productName);
+//            }
+//        } else {
+//            //해당 완제품의 재고가 없는 경우 예외
+//            throw new IllegalArgumentException("Material not found in stock: " + productName);
+//        }
+        CurrentProduct currentProduct = currentProductRepositoryHwang.findByCurrentProductName(productName);
 
-        if (optionalCurrentProduct.isPresent()) {
-            //해당 완재품의 재고가 있는 경우
-            CurrentProduct currentProduct = optionalCurrentProduct.get();
-            Long currentProductAmount = currentProduct.getCurrentProductAmount();
-
-            if (currentProductAmount >= productAmount) {
-                //재고가 충분한 경우, 출고량을 차감
-                currentProduct.setCurrentProductSafeAmount(currentProductAmount - productAmount);
-                currentProductRepositoryHwang.save(currentProduct);
-            } else {
-                //재고가 충분치 않다면 예외
-                throw new IllegalArgumentException("Insufficient stock for material: " + productName);
-            }
-        } else {
-            //해당 완제품의 재고가 없는 경우 예외
-            throw new IllegalArgumentException("Material not found in stock: " + productName);
-        }
+        currentProduct.setCurrentProductAmount(currentProduct.getCurrentProductAmount()-productAmount);
+        currentProductRepositoryHwang.save(currentProduct);
     }
+
 }
