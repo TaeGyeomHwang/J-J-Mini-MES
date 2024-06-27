@@ -107,6 +107,7 @@ public class ProductInOutServiceHwang {
         //업체인지 개인인지, 업체면 일반 재고량 출고, 개인이면 안전 재고량 출고
         //긴급일 때
         if (order.isOrderIsEmergency()) {
+            System.out.println("order의 isEmergency값: "+order.isOrderIsEmergency());
             //완제품 입출고 이력에 추가(출고)
             productInOutRepositoryHwang.save(createInData(order.getOrderProductType(), productAmount, outDate, 0));
 

@@ -65,7 +65,7 @@ public class CurrentProductServiceHwang {
 //            currentProductRepositoryHwang.save(currentProduct);
 //        }
         CurrentProduct currentProduct = currentProductRepositoryHwang.findByCurrentProductName(productName);
-        currentProduct.setCurrentProductAmount(currentProduct.getCurrentProductSafeAmount()+productAmount);
+        currentProduct.setCurrentProductSafeAmount(currentProduct.getCurrentProductSafeAmount()+productAmount);
         currentProductRepositoryHwang.save(currentProduct);
     }
 
@@ -109,7 +109,7 @@ public class CurrentProductServiceHwang {
 //            throw new IllegalArgumentException("Material not found in stock: " + productName);
 //        }
         CurrentProduct currentProduct = currentProductRepositoryHwang.findByCurrentProductName(productName);
-        currentProduct.setCurrentProductAmount(currentProduct.getCurrentProductSafeAmount()-productAmount);
+        currentProduct.setCurrentProductSafeAmount(currentProduct.getCurrentProductSafeAmount()-productAmount);
         currentProductRepositoryHwang.save(currentProduct);
     }
 

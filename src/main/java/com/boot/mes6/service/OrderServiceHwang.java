@@ -28,6 +28,8 @@ public class OrderServiceHwang {
     private final CurrentTimeRepositoryHwang currentTimeRepositoryHwang;
     private final CurrentProductRepositoryHwang currentProductRepositoryHwang;
 
+    private final ProductInOutServiceHwang productInOutServiceHwang;
+
     //  수주 이력 가져오기
     public List<Order> getAllOrder() {
         return orderRepositoryHwang.findAll();
@@ -63,7 +65,7 @@ public class OrderServiceHwang {
                     order.setOrderIsEmergency(orderFormDto.isOrderIsEmergency());
                     order.setOrderStatus(OrderStatus.SHIPPED);
                     /*  여기에 완제품 출고 메소드 삽입   */
-//                    (Order order, Long orderFormDto.getOrderAmount(), LocalDateTime currentTime.getCurrentTimeValue(), ProductName orderFormDto.getProductName());
+                    productInOutServiceHwang.productOut(order, order.getOrderAmount(), currentTime.getCurrentTimeValue());
 
                 } else {
                     order.setOrderIsEmergency(orderFormDto.isOrderIsEmergency());
@@ -87,8 +89,10 @@ public class OrderServiceHwang {
                 order.setOrderOutDate(currentTime.getCurrentTimeValue());
                 order.setOrderIsEmergency(orderFormDto.isOrderIsEmergency());
                 order.setOrderStatus(OrderStatus.SHIPPED);
+
                 /*  여기에 완제품 출고 메소드 삽입   */
-//                (Order order, Long orderFormDto.getOrderAmount(), LocalDateTime currentTime.getCurrentTimeValue(), ProductName orderFormDto.getProductName());
+                productInOutServiceHwang.productOut(order, order.getOrderAmount(), currentTime.getCurrentTimeValue());
+
 
                 orderRepositoryHwang.save(order);
                 break;
