@@ -55,19 +55,22 @@ public class CurrentProductServiceHwang {
 
     //완제품 안전 재고량에 추가
     public void addSafeProduct(ProductName productName, Long productAmount) {
-        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
-
-        if (optionalCurrentProduct.isPresent()) {
-            //해당 완제품의 재고가 있을 경우 수량 업데이트
-            CurrentProduct currentProduct = optionalCurrentProduct.get();
-            Long currentProductSafeAmount = currentProduct.getCurrentProductSafeAmount() + productAmount;
-            currentProduct.setCurrentProductSafeAmount(currentProductSafeAmount);
-            currentProductRepositoryHwang.save(currentProduct);
-        }
+//        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
+//
+//        if (optionalCurrentProduct.isPresent()) {
+//            //해당 완제품의 재고가 있을 경우 수량 업데이트
+//            CurrentProduct currentProduct = optionalCurrentProduct.get();
+//            Long currentProductSafeAmount = currentProduct.getCurrentProductSafeAmount() + productAmount;
+//            currentProduct.setCurrentProductSafeAmount(currentProductSafeAmount);
+//            currentProductRepositoryHwang.save(currentProduct);
+//        }
+        CurrentProduct currentProduct = currentProductRepositoryHwang.findByCurrentProductName(productName);
+        currentProduct.setCurrentProductAmount(currentProduct.getCurrentProductSafeAmount()+productAmount);
+        currentProductRepositoryHwang.save(currentProduct);
     }
 
     //완제품 일반 재고량에 추가
-//    public void addNormalProduct(ProductName productName, Long productAmount) {
+    public void addNormalProduct(ProductName productName, Long productAmount) {
 //        System.out.println("Adding normal product: " + productName + ", amount: " + productAmount);
 //
 //        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
@@ -78,8 +81,6 @@ public class CurrentProductServiceHwang {
 //            currentProduct.setCurrentProductAmount(currentProductNormalAmount);
 //            currentProductRepositoryHwang.save(currentProduct);
 //        }
-//    }
-    public void addNormalProduct(ProductName productName, Long productAmount) {
         CurrentProduct currentProduct = currentProductRepositoryHwang.findByCurrentProductName(productName);
 
         currentProduct.setCurrentProductAmount(currentProduct.getCurrentProductAmount()+productAmount);
@@ -88,25 +89,28 @@ public class CurrentProductServiceHwang {
 
     //완제품 안전 재고량에서 빼기
     public void minusSafeProduct(ProductName productName, Long productAmount) {
-        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
-
-        if (optionalCurrentProduct.isPresent()) {
-            //해당 완재품의 재고가 있는 경우
-            CurrentProduct currentProduct = optionalCurrentProduct.get();
-            Long currentProductSafeAmount = currentProduct.getCurrentProductSafeAmount();
-
-            if (currentProductSafeAmount >= productAmount) {
-                //재고가 충분한 경우, 출고량을 차감
-                currentProduct.setCurrentProductSafeAmount(currentProductSafeAmount - productAmount);
-                currentProductRepositoryHwang.save(currentProduct);
-            } else {
-                //재고가 충분치 않다면 예외
-                throw new IllegalArgumentException("Insufficient stock for material: " + productName);
-            }
-        } else {
-            //해당 완제품의 재고가 없는 경우 예외
-            throw new IllegalArgumentException("Material not found in stock: " + productName);
-        }
+//        Optional<CurrentProduct> optionalCurrentProduct = currentProductRepositoryHwang.getCurrentProductAmount(productName);
+//
+//        if (optionalCurrentProduct.isPresent()) {
+//            //해당 완재품의 재고가 있는 경우
+//            CurrentProduct currentProduct = optionalCurrentProduct.get();
+//            Long currentProductSafeAmount = currentProduct.getCurrentProductSafeAmount();
+//
+//            if (currentProductSafeAmount >= productAmount) {
+//                //재고가 충분한 경우, 출고량을 차감
+//                currentProduct.setCurrentProductSafeAmount(currentProductSafeAmount - productAmount);
+//                currentProductRepositoryHwang.save(currentProduct);
+//            } else {
+//                //재고가 충분치 않다면 예외
+//                throw new IllegalArgumentException("Insufficient stock for material: " + productName);
+//            }
+//        } else {
+//            //해당 완제품의 재고가 없는 경우 예외
+//            throw new IllegalArgumentException("Material not found in stock: " + productName);
+//        }
+        CurrentProduct currentProduct = currentProductRepositoryHwang.findByCurrentProductName(productName);
+        currentProduct.setCurrentProductAmount(currentProduct.getCurrentProductSafeAmount()-productAmount);
+        currentProductRepositoryHwang.save(currentProduct);
     }
 
     //완제품 일반 재고량에서 빼기
