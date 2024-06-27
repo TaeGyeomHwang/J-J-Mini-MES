@@ -56,6 +56,7 @@ public class MainController {
         return result;
     }
 
+    //  그래프 기본값을 위한 현재 시간 정보 제공 API
     @GetMapping("/api/currentTime/graph")
     @ResponseBody
     public Map<String, String> getCurrentTime() {
