@@ -58,6 +58,13 @@
             </select>
         </div>
         <div class="form-group">
+            <label th:for="orderIsEmergency">긴급 여부</label>
+            <select name="orderIsEmergency" class="form-select" th:field="*{orderIsEmergency}">
+                <option selected value="false">N</option>
+                <option value="true">Y</option>
+            </select>
+        </div>
+        <div class="form-group">
             <label th:for="productName">제품명</label>
             <select name="productName" class="form-select" th:field="*{productName}">
                 <option selected value="CABBAGE_JUICE">양배추즙</option>
@@ -73,13 +80,6 @@
         <div class="form-group">
             <label th:for="orderCustomerName">업체명/고객명</label>
             <input type="text" th:field="*{orderCustomerName}" class="form-control" placeholder="업체명(고객명)을 입력하세요">
-        </div>
-        <div class="form-group">
-            <label th:for="orderIsEmergency">긴급 여부</label>
-            <select name="orderIsEmergency" class="form-select" th:field="*{orderIsEmergency}">
-                <option selected value="false">N</option>
-                <option value="true">Y</option>
-            </select>
         </div>
         <br>
         <div style="text-align: center">
