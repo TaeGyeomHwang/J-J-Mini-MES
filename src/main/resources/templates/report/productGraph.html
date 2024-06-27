@@ -7,32 +7,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>일일/월간 생산량</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            align-items: flex-start; /* 상단을 맞추기 위해 추가 */
+        }
+        .chart-item {
+            width: 48%;
+            min-width: 300px; /* 최소 너비 설정 */
+            margin-bottom: 20px;
+        }
+        .chart-item canvas {
+            width: 100%;
+            height: auto;
+        }
+        .container-fluid {
+            padding: 20px;
+        }
+        .mt-4 {
+            margin-top: 20px; /* 위쪽 여백 조정 */
+        }
+    </style>
 </head>
 
+<body>
 <div layout:fragment="content" class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
-        <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">일일 생산량</h1>
+    <div class="chart-container">
+        <div class="chart-item">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
+                <h1 class="h3 mb-0 text-gray-800">일일 생산량</h1>
+            </div>
+
+            <div>
+                <label for="date">날짜 선택:</label>
+                <input type="date" id="date">
+                <button id="loadDailyDataButton">조회</button>
+            </div>
+
+            <canvas id="dailyProductInOutChart"></canvas>
+        </div>
+
+        <div class="chart-item">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
+                <h1 class="h3 mb-0 text-gray-800">월간 생산량</h1>
+            </div>
+
+            <div class="mt-4">
+                <label for="monthlyDate">날짜 선택:</label>
+                <input type="month" id="monthlyDate">
+                <button id="loadMonthlyDataButton">조회</button>
+            </div>
+
+            <canvas id="monthlyProductInOutChart"></canvas>
+        </div>
     </div>
-
-    <div>
-        <label for="date">날짜 선택:</label>
-        <input type="date" id="date">
-        <button id="loadDailyDataButton">조회</button>
-    </div>
-
-    <canvas id="dailyProductInOutChart" width="400" height="200"></canvas>
-
-    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="margin-top: 10px">
-        <h1 class="h3 mb-0 text-gray-800" style="font-weight:900;">월간 생산량</h1>
-    </div>
-
-    <div class="mt-4">
-        <label for="monthlyDate">날짜 선택:</label>
-        <input type="month" id="monthlyDate">
-        <button id="loadMonthlyDataButton">조회</button>
-    </div>
-
-    <canvas id="monthlyProductInOutChart" width="400" height="200"></canvas>
 </div>
 
 <th:block layout:fragment="script">
@@ -158,4 +188,5 @@
     </script>
 </th:block>
 
+</body>
 </html>
