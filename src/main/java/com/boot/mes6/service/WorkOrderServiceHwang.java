@@ -152,7 +152,7 @@ public class WorkOrderServiceHwang {
                         //  투입량 계산
                         long wrapProductionAmount = plan.getPlanProductionAmount() * 25;
                         workOrder.setWorkOrderInput(workOrderInput);
-                        workOrder.setWorkOrderOutput(wrapProductionAmount - (long) Math.ceil(wrapProductionAmount * 0.03));
+                        workOrder.setWorkOrderOutput(wrapProductionAmount);
                         workOrder.setWorkOrderStartDate(planStartDate);
                         //  충진에 필요한 시간 계산 (시간)
                         long wrapProductionTimeInHours = (long) Math.ceil((double) wrapProductionAmount / 2000);
