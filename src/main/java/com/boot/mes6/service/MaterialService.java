@@ -66,24 +66,50 @@ public class MaterialService {
             case CABBAGE_JUICE:
                 materialAmount = calculateMaterialAmount(orderProductType, productionAmount);
                 subMaterialAmount = calculateSubMaterialAmount(orderProductType, productionAmount);
+
+                //원자재에 최소 주문량이 있음
+                //양배추, 흑마늘은 100kg -> 25Box가 100kg이 필요
+                if(materialAmount < 100L || subMaterialAmount < 1L) {
+                    materialAmount = 100L;
+                    subMaterialAmount = 1L;
+                }
+
                 calculateReceiptDate(order, materialAmount, 12, MAX_JUICE_ORDER_AMOUNT, MaterialName.CABBAGE, materialOrderDate, MaterialSupplierName.A_FARM);
                 calculateReceiptDate(order, subMaterialAmount, 12, MAX_HONEY_ORDER_AMOUNT, MaterialName.HONEY, materialOrderDate, MaterialSupplierName.A_FARM);
                 break;
             case GARLIC_JUICE:
                 materialAmount = calculateMaterialAmount(orderProductType, productionAmount);
                 subMaterialAmount = calculateSubMaterialAmount(orderProductType, productionAmount);
+
+                if(materialAmount < 100L || subMaterialAmount < 1L) {
+                    materialAmount = 100L;
+                    subMaterialAmount = 1L;
+                }
+
                 calculateReceiptDate(order, materialAmount, 12, MAX_JUICE_ORDER_AMOUNT, MaterialName.GARLIC, materialOrderDate, MaterialSupplierName.A_FARM);
                 calculateReceiptDate(order, subMaterialAmount, 12, MAX_HONEY_ORDER_AMOUNT, MaterialName.HONEY, materialOrderDate, MaterialSupplierName.A_FARM);
                 break;
             case POMEGRANATE_JELLY:
                 materialAmount = calculateMaterialAmount(orderProductType, productionAmount);
                 subMaterialAmount = calculateSubMaterialAmount(orderProductType, productionAmount);
+
+                if(materialAmount < 20L || subMaterialAmount < 20L) {
+                    materialAmount = 20L;
+                    subMaterialAmount = 20L;
+                }
+
                 calculateReceiptDate(order, materialAmount, 15, MAX_STICK_ORDER_AMOUNT, MaterialName.POMEGRANATE, materialOrderDate, MaterialSupplierName.OO_NH);
                 calculateReceiptDate(order, subMaterialAmount, 15, MAX_STICK_ORDER_AMOUNT, MaterialName.COLLAGEN, materialOrderDate, MaterialSupplierName.OO_NH);
                 break;
             case PLUM_JELLY:
                 materialAmount = calculateMaterialAmount(orderProductType, productionAmount);
                 subMaterialAmount = calculateSubMaterialAmount(orderProductType, productionAmount);
+
+                if(materialAmount < 20L || subMaterialAmount < 20L) {
+                    materialAmount = 20L;
+                    subMaterialAmount = 20L;
+                }
+
                 calculateReceiptDate(order, materialAmount, 15, MAX_STICK_ORDER_AMOUNT, MaterialName.PLUM, materialOrderDate, MaterialSupplierName.OO_NH);
                 calculateReceiptDate(order, subMaterialAmount, 15, MAX_STICK_ORDER_AMOUNT, MaterialName.COLLAGEN, materialOrderDate, MaterialSupplierName.OO_NH);
                 break;
